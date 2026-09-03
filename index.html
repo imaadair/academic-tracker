@@ -18,6 +18,7 @@
     --red-bright:#D6491F;
     --yellow:#E3AE33;
     --green:#5C8A5A;
+    --blue:#4A7C9B;
     --gray:#5A574F;
     --radius:2px;
     /* Dedicated colors for School Deadlines categories — deliberately
@@ -178,10 +179,61 @@
     transition:background .15s ease, transform .15s ease;
   }
   .card:hover{background:var(--slate-card-hover);}
-  .card.status-open{border-left-color:var(--yellow);}
-  .card.status-applied{border-left-color:var(--green);}
+  .card.status-open{border-left-color:var(--green);}
+  .card.status-applied{border-left-color:var(--blue);}
   .card.status-notopen{border-left-color:var(--gray);}
   .card.status-closed{border-left-color:#3A3A35;opacity:0.55;}
+
+  /* Status bubble. "Open" is green so a live posting reads at a glance. */
+  .status-pill{
+    display:inline-block;
+    font-family:'Oswald',sans-serif;
+    font-size:10.5px;
+    font-weight:600;
+    letter-spacing:0.09em;
+    text-transform:uppercase;
+    padding:3px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+    background:#00000035;
+    color:var(--ink-dim);
+  }
+  .status-pill.pill-open{background:var(--green);color:#F2F7F1;}
+  .status-pill.pill-applied{background:var(--blue);color:#F1F6F9;}
+  .status-pill.pill-closed{background:#3A3A35;color:#9C9789;}
+
+  /* Live Summer 2027 postings found by the daily scan. */
+  .postings{
+    margin:10px 0 4px;
+    padding:10px 12px;
+    background:#5C8A5A18;
+    border:1px solid #5C8A5A55;
+    border-radius:4px;
+  }
+  .postings-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--green);
+    margin-bottom:7px;
+  }
+  .posting-item{margin:0 0 7px;line-height:1.4;}
+  .posting-item:last-child{margin-bottom:0;}
+  .posting-link{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink) !important;
+    text-decoration:none;
+    border-bottom:1px solid var(--green);
+  }
+  .posting-link:hover{color:var(--green) !important;}
+  .posting-meta{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-dim);
+    margin-top:2px;
+  }
 
   .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
   .card-company{
@@ -1102,28 +1154,38 @@
    For each company below:
      - set "status" to "notopen" | "open" | "applied" | "interviewing" | "closed"
      - set "lastChecked" to today's date as "YYYY-MM-DD" every time you check it
+     - fill "postings" with EVERY live Summer 2027 internship found at that
+       company, in ANY department — not just the one named in "position".
+       Each entry: {title, url, found}
+         title = the posting's real name, exactly as the board shows it
+         url   = direct link to that specific posting's application page,
+                 NOT the generic careers page
+         found = date first seen, "YYYY-MM-DD"
+       Empty array when nothing is live. Drop entries once they come down.
+   Set status to "open" whenever postings is non-empty (unless Ima has
+   manually moved the card to applied/interviewing — never overwrite those).
    Update LAST_AUTO_CHECK to today's date every run, regardless of findings.
    Do not remove or rename any fields — the page reads them directly.
+   "position" is now just a focus label; it no longer limits what counts.
    ====================================================================== */
 const LAST_AUTO_CHECK = "2026-09-02";
 
 const COMPANIES = [
-  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx"},
-  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"Broad program, Sept–Nov window", url:"https://www.nbcunicareers.com", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx"},
-  {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx"},
-  {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx"},
-  {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx"},
-  {id:"disney", company:"Disney Entertainment", position:"Disney Entertainment Internship", expected:"2026-09-15", note:"Sept–Oct window", url:"https://www.disneycareers.com/en/internships-united-states", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx"},
-  {id:"disney_csbdt", company:"Disney — CSBDT", position:"Corp. Strategy / Biz Dev & Tech Internship", expected:"2026-09-15", note:"Watch alongside main Disney window", url:"https://www.disneycareers.com/en/internships-united-states", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"},
-  {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx"},
-  {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx"},
-  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx"},
-  {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx"},
-  {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx"},
-  {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx"},
-  {id:"dirty", company:"Dirty Films", position:"Development Internship", expected:null, note:"Rolling — check monthly. Site has no formal careers page; status unverifiable.", url:"https://dirtyfilms.com", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_DirtyFilms_Development.docx"},
-  {id:"lionsgate", company:"Lionsgate", position:"TV Scripted Development Internship", expected:"2027-01-26", note:"Deadline mid–late Feb", url:"https://jobs.lionsgate.com/Lionsgate/go/Lionsgate-Internships/9552700/", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Lionsgate_TVDevelopment.docx"},
-  {id:"laika", company:"LAIKA Studios", position:"Production Management Internship", expected:"2027-03-02", note:"You have an internal connection — highest-leverage lead", url:"https://www.laika.com/careers", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_LAIKA.docx", coverFile:"files/Ima_Kennerly_CoverLetter_LAIKA_ProductionManagement.docx"},
+  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[]},
+  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"Broad program, Sept–Nov window", url:"https://www.nbcunicareers.com", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", postings:[]},
+  {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx", postings:[]},
+  {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx", postings:[]},
+  {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx", postings:[]},
+  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Accounting & Finance Rotation Program Internship, Summer 2027", url:"https://www.disneycareers.com/en/job/glendale/accounting-and-finance-rotation-program-internship-summer-2027/391/100010094960", found:"2026-09-02"}]},
+  {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx", postings:[]},
+  {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx", postings:[]},
+  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[]},
+  {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx", postings:[]},
+  {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx", postings:[]},
+  {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx", postings:[]},
+  {id:"dirty", company:"Dirty Films", position:"Development Internship", expected:null, note:"Rolling — check monthly. Site has no formal careers page; status unverifiable.", url:"https://dirtyfilms.com", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_DirtyFilms_Development.docx", postings:[]},
+  {id:"lionsgate", company:"Lionsgate", position:"TV Scripted Development Internship", expected:"2027-01-26", note:"Deadline mid–late Feb", url:"https://jobs.lionsgate.com/Lionsgate/go/Lionsgate-Internships/9552700/", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Lionsgate_TVDevelopment.docx", postings:[]},
+  {id:"laika", company:"LAIKA Studios", position:"Production Management Internship", expected:"2027-03-02", note:"You have an internal connection — highest-leverage lead", url:"https://www.laika.com/careers", status:"notopen", lastChecked:"2026-09-02", resumeFile:"files/Ima_Kennerly_Resume_LAIKA.docx", coverFile:"files/Ima_Kennerly_CoverLetter_LAIKA_ProductionManagement.docx", postings:[]},
 ];
 /* ==================== END AUTOMATED-CHECK DATA BLOCK ==================== */
 
@@ -1680,16 +1742,36 @@ async function loadState(id){
   const fileDefault = {status: company.status, lastChecked: company.lastChecked, notes:""};
   try{
     const res = await window.storage.get(STORAGE_PREFIX + id, false);
-    // Only trust a stored override if the file's own value hasn't moved past it —
-    // otherwise a fresh automated check would be masked by a stale manual toggle.
     if(res){
-      const stored = JSON.parse(res.value);
-      return stored;
+      return mergeState(JSON.parse(res.value), fileDefault);
     }
     return fileDefault;
   }catch(e){
-    return localState[id] || fileDefault;
+    const cached = localState[id];
+    return cached ? mergeState(cached, fileDefault) : fileDefault;
   }
+}
+
+// Reconcile a stored (manual) state against the file's automated state.
+//
+// Statuses split into two kinds:
+//   - "applied" / "interviewing" / "closed" record what Ima has actually DONE.
+//     Only she can know these, so a stored value always wins and the daily
+//     scan must never clobber it.
+//   - "notopen" / "open" are the scan's call. The automated value wins here,
+//     otherwise a stale "notopen" sitting in storage would hide a posting
+//     that went live — which is exactly the alert this page exists to give.
+function mergeState(stored, fileDefault){
+  const MANUAL = ["applied","interviewing","closed"];
+  const status = MANUAL.includes(stored.status) ? stored.status : fileDefault.status;
+  // Keep whichever check date is later, so "Log check — today" isn't undone
+  // by an older date in the file (and vice versa).
+  const dates = [stored.lastChecked, fileDefault.lastChecked].filter(Boolean).sort();
+  return {
+    status: status,
+    lastChecked: dates.length ? dates[dates.length - 1] : null,
+    notes: stored.notes || ""
+  };
 }
 
 async function saveState(id, state){
@@ -1708,6 +1790,18 @@ function statusLabel(status){
     applied:"Applied",
     interviewing:"Interviewing",
     closed:"Closed / passed"
+  }[status] || status;
+}
+
+// Short form for the status bubble — the dropdown below it carries the
+// longer wording, so the pill just needs the one-word state.
+function statusPillLabel(status){
+  return {
+    notopen:"Not open yet",
+    open:"Open",
+    applied:"Applied",
+    interviewing:"Interviewing",
+    closed:"Closed"
   }[status] || status;
 }
 
@@ -1740,7 +1834,13 @@ async function render(){
     const days = daysUntil(c.expected);
 
     if(state.status === "open" ){
-      actionItems.push(`<b>${c.company}</b> — marked open. Apply with the ${c.company==="LAIKA Studios"?"LAIKA":"matching"} resume + cover letter if you haven't yet.`);
+      const ps = c.postings || [];
+      if(ps.length){
+        actionItems.push(`<b>${c.company}</b> — ${ps.length} live Summer 2027 posting${ps.length===1?"":"s"}: ` +
+          ps.map(p => `<a href="${p.url}" target="_blank" rel="noopener">${p.title}</a>`).join("; "));
+      } else {
+        actionItems.push(`<b>${c.company}</b> — marked open. Apply with the ${c.company==="LAIKA Studios"?"LAIKA":"matching"} resume + cover letter if you haven't yet.`);
+      }
     } else if(days !== null && days <= 14 && days >= 0 && state.status === "notopen"){
       actionItems.push(`<b>${c.company}</b> — expected window opens in ${days} day${days===1?"":"s"}. Check their careers page.`);
     }
@@ -1768,12 +1868,33 @@ async function render(){
       countdownHtml = `<span class="countdown">${days}d</span>`;
     }
 
+    const postings = c.postings || [];
+    const pillClass = state.status === "open" ? "pill-open"
+      : (state.status === "applied" || state.status === "interviewing") ? "pill-applied"
+      : state.status === "closed" ? "pill-closed" : "";
+
+    // Live Summer 2027 postings from the daily scan. Each title links straight
+    // to that posting's own application page, not the generic careers page.
+    const postingsHtml = postings.length ? `
+      <div class="postings">
+        <div class="postings-label">${postings.length} live Summer 2027 posting${postings.length===1?"":"s"}</div>
+        ${postings.map(p => `
+          <div class="posting-item">
+            <a href="${p.url}" target="_blank" rel="noopener" class="posting-link">${p.title} →</a>
+            ${p.found ? `<div class="posting-meta">found ${fmtDate(p.found)}</div>` : ``}
+          </div>`).join("")}
+      </div>` : ``;
+
     card.innerHTML = `
       <div class="card-top">
         <h3 class="card-company">${c.company}</h3>
         ${countdownHtml}
       </div>
       <div class="card-position">${c.position}</div>
+      <div class="card-row" style="margin-bottom:8px;">
+        <span class="status-pill ${pillClass}">${statusPillLabel(state.status)}</span>
+      </div>
+      ${postingsHtml}
       <div class="card-meta">Expected: ${fmtDate(c.expected)}<br>${c.note}</div>
       <div class="card-row">
         <select data-id="${c.id}" class="status-select">
@@ -1793,7 +1914,7 @@ async function render(){
       </div>
       ${state.status === "open" ? `
       <div class="card-row">
-        <a href="${c.url}" target="_blank" rel="noopener" class="apply-now-btn">APPLY NOW →</a>
+        <a href="${postings.length === 1 ? postings[0].url : c.url}" target="_blank" rel="noopener" class="apply-now-btn">APPLY NOW →</a>
       </div>` : `
       <div class="card-links">
         <a href="${c.url}" target="_blank" rel="noopener" class="apply-link">Apply / careers page →</a>
@@ -1802,6 +1923,12 @@ async function render(){
         <a href="${c.resumeFile}">Resume</a>
         <a href="${c.coverFile}">Cover letter</a>
       </div>
+      ${(c.altDocs || []).map(d => `
+      <div class="card-links" style="margin-top:4px;">
+        <span class="posting-meta" style="margin:0 4px 0 0;">${d.label}:</span>
+        <a href="${d.resume}">Resume</a>
+        <a href="${d.cover}">Cover letter</a>
+      </div>`).join("")}
     `;
 
     const select = card.querySelector(".status-select");
