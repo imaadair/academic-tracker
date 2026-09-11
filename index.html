@@ -1109,7 +1109,7 @@
     <li><b>Warm-first cadence:</b> follow up with your five "Warm Contact" people (Devin Boss, Devin Jane Febbroriello, Dawn Jones Redstone, Ashley Song, Joe Bowden — all Desert Island Studios / indie film) before pushing more cold outreach. Warm relationships convert faster.</li>
     <li><b>Advance the stalled ones:</b> Diane A. and Nicole Black are already "Connected / Call Offered" but not yet scheduled — booking that call is your highest-leverage next step since they've already said yes.</li>
     <li><b>Cold-to-warm conversion:</b> Stephen Steiger, Blaise Meyer, and Ali Marszalkowski are still cold. A short, specific LinkedIn message referencing your shared Syracuse ties tends to outperform a generic connect request.</li>
-    <li><b>Fill remaining employer gaps:</b> Netflix, NBCUniversal, Disney, Warner Bros. Discovery and Paramount all picked up their first leads this week (see below), joining A24 and UTA — Blumhouse and Anonymous Content are the two holdouts; even a "Blumhouse recruiter" search came back with no Syracuse or mutual-connection matches yet.</li>
+    <li><b>Fill remaining employer gaps:</b> Netflix, NBCUniversal, Disney, Warner Bros. Discovery, Paramount and Anonymous Content have all picked up first leads (see below), joining A24 and UTA — Blumhouse is now the lone holdout; even a "Blumhouse recruiter" search came back with no Syracuse or mutual-connection matches.</li>
     <li><b>Use SU Connect:</b> several of your existing contacts came through Syracuse's official alumni platform — it's lower-friction than cold LinkedIn since alumni opt in to being contacted.</li>
   </ul>
   <div class="daily-connection">
@@ -1143,7 +1143,7 @@
   <br><br>
   <b>Blackboard sync:</b> a daily Claude Cowork scheduled task logs into Blackboard, reads the Calendar's "Due Dates" view (and HNR 350's Announcements tab) for all six courses, and updates the <code>BLACKBOARD_ASSIGNMENTS</code> block directly — new due dates show up under each course in the Study Center, on the School Deadlines calendar, and as badges on the weekly schedule, tagged "(auto)". Reopen or refresh this file after each run to see what's new. If a course shows nothing, its professor hasn't posted due dates on Blackboard yet.
   <br><br>
-  <b>Attendance policy &amp; exam/quiz/project dates:</b> read directly from each course's syllabus (not the daily sync — syllabi don't change weekly). TRF 444 and TRF 340 were still "Closed" on Blackboard as of the last check, so those two show "Contact professor in case of absence" until their instructors open the course and a syllabus becomes available.
+  <b>Attendance policy &amp; exam/quiz/project dates:</b> read directly from each course's syllabus (not the daily sync — syllabi don't change weekly). TRF 444's syllabus opened on Blackboard and its attendance policy and key dates are now reflected above. TRF 340 is still listed "Closed" on Blackboard as of the last check, so it still shows "Contact professor in case of absence" until its instructor opens the course and a syllabus becomes available.
 </div>
 
 <script>
@@ -1168,24 +1168,24 @@
    Do not remove or rename any fields — the page reads them directly.
    "position" is now just a focus label; it no longer limits what counts.
    ====================================================================== */
-const LAST_AUTO_CHECK = "2026-09-06";
+const LAST_AUTO_CHECK = "2026-09-11";
 
 const COMPANIES = [
-  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[]},
-  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"Broad program, Sept–Nov window", url:"https://www.nbcunicareers.com", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", postings:[]},
-  {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx", postings:[]},
-  {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx", postings:[]},
-  {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx", postings:[]},
-  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Accounting & Finance Rotation Program Internship, Summer 2027", url:"https://www.disneycareers.com/en/job/glendale/accounting-and-finance-rotation-program-internship-summer-2027/391/100010094960", found:"2026-09-02"}]},
-  {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx", postings:[]},
-  {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx", postings:[]},
-  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[]},
-  {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx", postings:[]},
-  {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx", postings:[]},
-  {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx", postings:[]},
-  {id:"dirty", company:"Dirty Films", position:"Development Internship", expected:null, note:"Rolling — check monthly. Site has no formal careers page; status unverifiable.", url:"https://dirtyfilms.com", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_DirtyFilms_Development.docx", postings:[]},
-  {id:"lionsgate", company:"Lionsgate", position:"TV Scripted Development Internship", expected:"2027-01-26", note:"Deadline mid–late Feb", url:"https://jobs.lionsgate.com/Lionsgate/go/Lionsgate-Internships/9552700/", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Lionsgate_TVDevelopment.docx", postings:[]},
-  {id:"laika", company:"LAIKA Studios", position:"Production Management Internship", expected:"2027-03-02", note:"You have an internal connection — highest-leverage lead", url:"https://www.laika.com/careers", status:"notopen", lastChecked:"2026-09-06", resumeFile:"files/Ima_Kennerly_Resume_LAIKA.docx", coverFile:"files/Ima_Kennerly_CoverLetter_LAIKA_ProductionManagement.docx", postings:[]},
+  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[]},
+  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"Broad program, Sept–Nov window", url:"https://www.nbcunicareers.com", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", postings:[]},
+  {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx", postings:[]},
+  {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx", postings:[]},
+  {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx", postings:[]},
+  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Accounting & Finance Rotation Program Internship, Summer 2027", url:"https://www.disneycareers.com/en/job/glendale/accounting-and-finance-rotation-program-internship-summer-2027/391/100010094960", found:"2026-09-02"}]},
+  {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx", postings:[]},
+  {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx", postings:[]},
+  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[]},
+  {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx", postings:[]},
+  {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx", postings:[]},
+  {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx", postings:[]},
+  {id:"dirty", company:"Dirty Films", position:"Development Internship", expected:null, note:"Rolling — check monthly. Site has no formal careers page; status unverifiable.", url:"https://dirtyfilms.com", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_DirtyFilms_Development.docx", postings:[]},
+  {id:"lionsgate", company:"Lionsgate", position:"TV Scripted Development Internship", expected:"2027-01-26", note:"Deadline mid–late Feb", url:"https://jobs.lionsgate.com/Lionsgate/go/Lionsgate-Internships/9552700/", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Lionsgate_TVDevelopment.docx", postings:[]},
+  {id:"laika", company:"LAIKA Studios", position:"Production Management Internship", expected:"2027-03-02", note:"You have an internal connection — highest-leverage lead", url:"https://www.laika.com/careers", status:"notopen", lastChecked:"2026-09-11", resumeFile:"files/Ima_Kennerly_Resume_LAIKA.docx", coverFile:"files/Ima_Kennerly_CoverLetter_LAIKA_ProductionManagement.docx", postings:[]},
 ];
 /* ==================== END AUTOMATED-CHECK DATA BLOCK ==================== */
 
@@ -1302,11 +1302,15 @@ const CONTACTS_SEED = [
    are 2nd-degree connections or share a mutual connection with someone
    already in the Contacts tracker. One is surfaced per day below, rotating
    through the list by calendar date. Updated 2026-08-08 with a second pass
-   that found leads at A24 and UTA, and 2026-08-31 with first leads at
-   Netflix, NBCUniversal, Disney, Warner Bros. Discovery and Paramount.
-   Coverage gaps: Blumhouse and Anonymous Content still have no strong match
-   (all results 3rd+ degree with no mutual) — re-search later. A weekly
-   scheduled task ("weekly-linkedin-network-check") keeps this list refreshed
+   that found leads at A24 and UTA, 2026-08-31 with first leads at Netflix,
+   NBCUniversal, Disney, Warner Bros. Discovery and Paramount, and 2026-09-11
+   with a first lead at Anonymous Content plus additional leads at Paramount,
+   WME, A24 and Sony Pictures.
+   Coverage gaps: Blumhouse still has no strong match (all results 3rd+
+   degree with no mutual, even on a "Blumhouse recruiter" search) — re-search
+   later. Dirty Films returns no relevant LinkedIn results at all (search
+   also partially blocked by LinkedIn's keyword filter). A weekly scheduled
+   task ("weekly-linkedin-network-check") keeps this list refreshed
    automatically.
    ====================================================================== */
 const LINKEDIN_LEADS = [
@@ -1331,6 +1335,12 @@ const LINKEDIN_LEADS = [
   {id:"l-crowe", name:"Tyler Crowe", title:"Strategic Talent Leader — Shaping the Next Generation of Storytellers at Warner Bros. Discovery", employer:"Warner Bros. Discovery", mutual:"Nehru Madan", angle:"Runs early-career/emerging-talent programs at WBD — the highest-value WBD contact found so far, and Nehru is a 1st-degree connection who can introduce you."},
   {id:"l-oconnell", name:"Sarah O'Connell", title:"Manager, Promotion Planning at HBO Max | Warner Bros. Discovery", employer:"Warner Bros. Discovery", mutual:"Nehru Madan", angle:"Manager-level WBD contact via Nehru — useful second WBD thread alongside Nicole Black and Stephen Steiger."},
   {id:"l-herzog", name:"Elliot Herzog", title:"EP @ Patio Prod. / Creative Affairs @ Paramount Pictures", employer:"Paramount", mutual:"Colin Turner", angle:"First Paramount lead on the creative-affairs side rather than analytics — directly relevant to the TV/Film Development internship you're targeting."},
+  {id:"l-neuberger", name:"Benjamin Neuberger", title:"Assistant to Literary Manager/Producer at Anonymous Content", employer:"Anonymous Content", mutual:"Dan Tiwari", angle:"First real lead found at Anonymous Content — an assistant-level entry point, exactly the coverage gap this tracker had been flagging."},
+  {id:"l-brown", name:"Alexandria Brown", title:"Broadcast Sales Planner, Pricing & Inventory at Paramount | 2024 Syracuse grad", employer:"Paramount", mutual:"Gabrielle Barnett", angle:"Recent Syracuse grad now at Paramount — good peer-level contact to ask how her own job search went."},
+  {id:"l-brachfeld", name:"Maddie Brachfeld", title:"Agent Associate at WME (William Morris Endeavor)", employer:"WME", mutual:"Nehru Madan", angle:"Entry-level agent-track contact at WME, one mutual away."},
+  {id:"l-lapp", name:"Truman Lapp", title:"Rotational Assistant at WME (William Morris Endeavor)", employer:"WME", mutual:"Dan Tiwari", angle:"Rotational assistant program is exactly the entry point the WME internship feeds into — worth asking about the rotation structure."},
+  {id:"l-phok", name:"Peter Phok", title:"Production Executive (Physical Production, Budgets & Schedules) — A24's X Trilogy", employer:"A24", mutual:"Devin Jane Febbroriello", angle:"Second A24 lead, on the physical-production side rather than marketing — mutual is already a Warm Contact in your tracker."},
+  {id:"l-mitchell", name:"Solia Mitchell", title:"Manager, Global Talent Acquisition — Film & TV at Sony Pictures Entertainment", employer:"Sony Pictures", mutual:"John Dolan", angle:"Directly recruits for film/TV roles at Sony Pictures — about as relevant as a contact gets for an internship push."},
 ];
 
 /* ======================================================================
@@ -1342,10 +1352,10 @@ const LINKEDIN_LEADS = [
    answered yet). No messages are ever sent automatically — this block is
    read-only reporting. The weekly "weekly-linkedin-network-check" scheduled
    task refreshes this list each run.
-   Last checked: 2026-08-31.
+   Last checked: 2026-09-11.
    ====================================================================== */
 const MESSAGE_ALERTS = [
-  {id:"m-gorsline", name:"Russ Gorsline", employer:"Chief Engineer, Portland production company (North East Production circle)", date:"2026-08-05", preview:"This week is crazy for me. Let's look for a time next week for a call. Give me some times.", needsFromYou:"A short list of call times — he asked 26 days ago and the thread has gone quiet"},
+  {id:"m-gorsline", name:"Russ Gorsline", employer:"Chief Engineer, Portland production company (North East Production circle)", date:"2026-08-05", preview:"This week is crazy for me. Let's look for a time next week for a call. Give me some times.", needsFromYou:"A short list of call times — he asked 37 days ago and the thread has gone quiet"},
   {id:"m-black", name:"Nicole Black", employer:"Warner Bros. Discovery", date:"2026-08-04", preview:"Hi, yes I'm on eastern time. 5 should work, my number is 9175664375.", needsFromYou:"A re-book — the Fri 5pm ET slot she agreed to passed weeks ago without a reply; propose a new evening time"},
 ];
 
@@ -1371,9 +1381,9 @@ const MESSAGE_ALERTS = [
    chapter, homework problem set, multi-part project) — not a scraped stat.
    The daily sync task assigns one to every new item it adds (see its
    SKILL.md), so this should stay populated going forward.
-   Last checked: 2026-09-05.
+   Last checked: 2026-09-11.
    ====================================================================== */
-const LAST_BLACKBOARD_CHECK = "2026-09-05";
+const LAST_BLACKBOARD_CHECK = "2026-09-11";
 
 const BLACKBOARD_ASSIGNMENTS = [
   {id:"bb-hnr350-1", courseId:"hnr350", title:"Homework, week of Aug 23 — Reading: Visual Culture (Boylan); Writing: Personal Reflective (PR)", date:"2026-08-26", estimatedMinutes:60},
@@ -1384,12 +1394,19 @@ const BLACKBOARD_ASSIGNMENTS = [
   {id:"bb-hnr350-3", courseId:"hnr350", title:"Homework, week of Aug 30 — Exercise 1: sketch an object, pattern, or design you are drawn to and describe why; Exercise 2: visual diagram of your interest in visual thinking and course goals", date:"2026-09-02", estimatedMinutes:45},
   {id:"bb-eee370-2", courseId:"eee370", title:"InQuizitive: Chapter 2 — Choosing Entrepreneurship", date:"2026-09-07", estimatedMinutes:30},
   {id:"bb-phi311-3", courseId:"phi311", title:"Reading assignment: Third Meditation", date:"2026-09-08", estimatedMinutes:30},
+  {id:"bb-acc201-6", courseId:"acc201", title:"Chapter 1 Quiz", date:"2026-09-08", estimatedMinutes:30},
   {id:"bb-hnr350-4", courseId:"hnr350", title:"Homework, week of Sept 6 — Reading: “Why Look at Animals?” by John Berger, pp. 1–13 (first half); note author, genre, and use annotation/marginalia to identify his thesis and main points", date:"2026-09-09", estimatedMinutes:45},
-  {id:"bb-acc201-1", courseId:"acc201", title:"Chapter F:1 Homework", date:"2026-09-08", estimatedMinutes:45},
-  {id:"bb-acc201-2", courseId:"acc201", title:"Chapter F:2 Homework", date:"2026-09-10", estimatedMinutes:45},
+  {id:"bb-acc201-1", courseId:"acc201", title:"Chapter F:1 Homework", date:"2026-09-10", estimatedMinutes:45},
+  {id:"bb-phi311-4", courseId:"phi311", title:"Worksheet on Descartes on God, Cognitive Error and Freedom", date:"2026-09-13", estimatedMinutes:45},
   {id:"bb-hnr350-5", courseId:"hnr350", title:"Homework, week of Sept 6 — Reading: “Why Look at Animals?” (Berger), pp. 1–26 (full article); Writing: 3-paragraph response — (1) analytical overview of Berger’s thesis, (2) reflection on one chosen animal image through the lens of visual thinking, (3) seeing nature through screens (digital/mediated encounters), with one contemporary example", date:"2026-09-14", estimatedMinutes:120},
   {id:"bb-eee370-3", courseId:"eee370", title:"InQuizitive: Chapter 3 — Choosing Your Opportunity", date:"2026-09-14", estimatedMinutes:30},
+  {id:"bb-phi311-5", courseId:"phi311", title:"Reading assignment: Descartes on Cognitive Error and Freedom (Meditation 4)", date:"2026-09-15", estimatedMinutes:30},
+  {id:"bb-acc201-2", courseId:"acc201", title:"Chapter F:2 Homework", date:"2026-09-15", estimatedMinutes:45},
+  {id:"bb-trf444-1", courseId:"trf444", title:"Modern Family Scheduling Exercise #1", date:"2026-09-16", estimatedMinutes:75},
+  {id:"bb-hnr350-6", courseId:"hnr350", title:"Homework, week of Sept 13 — Reading: “Biplane Visualization Takes Flight” (Povinelli); notebook Exercises 10, 13, 14 + Exercise 15 Step 1 (suggested checkpoint; full exercise due Sept 21)", date:"2026-09-16", estimatedMinutes:75},
   {id:"bb-eee370-4", courseId:"eee370", title:"InQuizitive: Chapter 4 — Choosing Your Strategy", date:"2026-09-21", estimatedMinutes:30},
+  {id:"bb-hnr350-7", courseId:"hnr350", title:"Homework, week of Sept 13 — Exercise 15 (“Biplane Visualization Takes Flight”), Steps 2–4 completed in notebook, ready to present in class", date:"2026-09-21", estimatedMinutes:90},
+  {id:"bb-phi311-6", courseId:"phi311", title:"Reading assignment on Descartes' dualism", date:"2026-09-22", estimatedMinutes:30},
   {id:"bb-eee370-5", courseId:"eee370", title:"InQuizitive: Chapter 5 — Choosing Your Customer", date:"2026-09-28", estimatedMinutes:30},
   {id:"bb-acc201-3", courseId:"acc201", title:"Chapter F:3 Homework", date:"2026-10-01", estimatedMinutes:45},
   {id:"bb-acc201-4", courseId:"acc201", title:"Chapter F:4 Homework", date:"2026-10-06", estimatedMinutes:45},
@@ -1402,14 +1419,15 @@ const BLACKBOARD_ASSIGNMENTS = [
    on Blackboard (by me, not a scheduled task — syllabi don't change weekly).
    allowedAbsences is null when the syllabus states no explicit numeric
    allowance (the page then shows "Contact professor in case of absence").
-   TRF 444 and TRF 340 are listed "Closed" by their instructors on
-   Blackboard as of this check, so no syllabus was available yet for those.
+   TRF 444's syllabus became available on Blackboard as of 2026-09-11 and is
+   now reflected below. TRF 340 is still listed "Closed" by its instructor
+   on Blackboard as of this check, so no syllabus was available yet for it.
    ====================================================================== */
 const SYLLABUS_INFO = {
   hnr350: {allowedAbsences:null, note:"No explicit absence limit stated. The lowest participation score is dropped to cover one missed/unexcused session; arriving 5+ min late counts as an absence."},
   eee370: {allowedAbsences:4, note:"More than 4 unexcused absences results in a zero for class participation (10% of course grade)."},
   acc201: {allowedAbsences:3, note:"3 unexcused absences allowed per semester without penalty. An unexcused absence on an exam day results in a zero for that exam."},
-  trf444: {allowedAbsences:null, note:"Course not yet opened by the instructor on Blackboard — syllabus not available yet."},
+  trf444: {allowedAbsences:0, note:"No unexcused absences are penalty-free: 10% (a full letter grade) is deducted from the final grade for each absence, and 5% (a half letter grade) for each lateness. Medical excuses require Health Center documentation (a visit alone doesn't count)."},
   trf340: {allowedAbsences:null, note:"Course is listed \"Closed\" on Blackboard — syllabus not available yet."},
   phi311: {allowedAbsences:null, note:"No attendance/absence policy stated in the syllabus."},
 };
@@ -1422,6 +1440,9 @@ const SYLLABUS_INFO = {
    loads; if the user has already typed something into a field, it is left
    alone (see renderStudy()). TRF 340 is still listed "Closed" by its
    instructor on Blackboard, so only the known professor name is available.
+   (TRF 444's syllabus header lists "Professor Manley" for the instructor
+   name, but the Blackboard course faculty listing and syllabus contact
+   block both point to Chase Clifford-Manley — kept as-is below.)
    ====================================================================== */
 const COURSE_INFO = {
   hnr350: {canvas:"https://blackboard.syracuse.edu/ultra/courses/_571556_1/outline", prof:"Dr. Mark J Povinelli", officeHours:"By appointment (email mjpovine@syr.edu or call 315-506-2683)"},
@@ -1455,6 +1476,8 @@ const SYLLABUS_ASSIGNMENTS = [
   {id:"syl-phi311-2", courseId:"phi311", title:"In-class Argument Analysis #2", date:"2026-10-08"},
   {id:"syl-phi311-3", courseId:"phi311", title:"In-class Argument Analysis #3", date:"2026-11-05"},
   {id:"syl-phi311-4", courseId:"phi311", title:"In-class Argument Analysis #4", date:"2026-12-03"},
+  {id:"syl-trf444-1", courseId:"trf444", title:"Production Videos & Party (last regular class day)", date:"2026-12-02"},
+  {id:"syl-trf444-2", courseId:"trf444", title:"Final EXAM / Feature Film Presentations due (40 pts)", date:"2026-12-09"},
 ];
 
 /* ======================================================================
