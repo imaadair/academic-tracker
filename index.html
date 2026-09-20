@@ -1038,8 +1038,9 @@
   <div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5;">
     Syncs your checkboxes, notes, custom calendar events, and study-plan changes to a private
     GitHub repo (<b>imaadair/academic-tracker-data</b>) so they show up on your other devices.
-    Paste your personal access token once per device — it's saved only in this browser's
-    storage, never written into this shared file.
+    If a token is embedded in the file (<b>GH_EMBEDDED_TOKEN</b>, near the top of the script),
+    every device that opens this file syncs automatically with no setup. Otherwise, paste a
+    token once per device below — that copy is saved only in this browser's storage.
   </div>
   <div class="add-row" style="padding:0;margin:0;">
     <input type="password" id="syncTokenInput" placeholder="Paste GitHub token (github_pat_...)">
@@ -1151,13 +1152,13 @@
 <div class="footer-note">
   <b>Folder structure needed:</b> for the Resume/Cover letter links on each card to work, keep this file alongside a <code>files/</code> subfolder containing all your resumes, cover letters, and <code>Ima_Kennerly_References.docx</code> — that's where they currently live.
   <br><br>
-  <b>How the statuses update:</b> nothing on the internet checks itself just by existing. Set up a <b>Claude Cowork</b> scheduled task (weekly) to check each careers page and edit the data block at the top of this file's script directly. Reopen or refresh this file after each run to see what changed.
+  <b>How the statuses update:</b> nothing on the internet checks itself just by existing. A <b>Claude Code scheduled task</b> ("Weekly careers check — Academic Command Center") runs every <b>Monday at 8am</b>, checks all 15 careers pages for live Summer 2027 postings in any department, and edits the data block at the top of this file's script directly. Reopen or refresh this file after each run to see what changed. It only runs while the Claude app is open — if the app was closed at 8am Monday, it runs on next launch.
   <br><br>
   <b>Applying:</b> click "Apply / careers page" to open the real posting, with Resume/Cover letter open in adjacent tabs. If you have <b>Claude in Chrome</b> installed, it can help fill the application form from those documents once you're on the page — it will still show you every field before anything is submitted.
   <br><br>
   <b>School Deadlines, Career Tasks, Contacts, and Honors Thesis:</b> these are new sections. Deadlines and thesis milestones are seeded from Syracuse's official calendar and the Honors Program's published timeline — check off tasks, add your own deadlines/tasks, and log contacts as you go. Everything you add is saved in this browser (not synced elsewhere), so keep opening this same file in the same browser.
   <br><br>
-  <b>Blackboard sync:</b> a daily Claude Cowork scheduled task logs into Blackboard, reads the Calendar's "Due Dates" view (and HNR 350's Announcements tab) for all six courses, and updates the <code>BLACKBOARD_ASSIGNMENTS</code> block directly — new due dates show up under each course in the Study Center, on the School Deadlines calendar, and as badges on the weekly schedule, tagged "(auto)". Reopen or refresh this file after each run to see what's new. If a course shows nothing, its professor hasn't posted due dates on Blackboard yet.
+  <b>Blackboard sync:</b> a daily Claude Code scheduled task ("Daily Blackboard sync — Academic Command Center", <b>7am daily</b>) logs into Blackboard through Ima's already-signed-in Chrome, reads the Calendar's "Due Dates" view (and HNR 350's Announcements tab) for all six courses, and updates the <code>BLACKBOARD_ASSIGNMENTS</code> block directly — new due dates show up under each course in the Study Center, on the School Deadlines calendar, and as badges on the weekly schedule, tagged "(auto)". Reopen or refresh this file after each run to see what's new. If a course shows nothing, its professor hasn't posted due dates on Blackboard yet. The sync needs a live Syracuse SSO session in Chrome: if it is asked for a password it stops and reports instead of editing anything, so an occasional run may need you to sign in first.
   <br><br>
   <b>Attendance policy &amp; exam/quiz/project dates:</b> read directly from each course's syllabus (not the daily sync — syllabi don't change weekly). TRF 444's syllabus opened on Blackboard and its attendance policy and key dates are now reflected above. TRF 340 is still listed "Closed" on Blackboard as of the last check, so it still shows "Contact professor in case of absence" until its instructor opens the course and a syllabus becomes available.
 </div>
@@ -1184,24 +1185,24 @@
    Do not remove or rename any fields — the page reads them directly.
    "position" is now just a focus label; it no longer limits what counts.
    ====================================================================== */
-const LAST_AUTO_CHECK = "2026-09-12";
+const LAST_AUTO_CHECK = "2026-09-15";
 
 const COMPANIES = [
-  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[]},
-  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"Broad program, Sept–Nov window", url:"https://www.nbcunicareers.com", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", postings:[]},
-  {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx", postings:[]},
-  {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx", postings:[]},
-  {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx", postings:[]},
-  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Accounting & Finance Rotation Program Internship, Summer 2027", url:"https://www.disneycareers.com/en/job/glendale/accounting-and-finance-rotation-program-internship-summer-2027/391/100010094960", found:"2026-09-02"}]},
-  {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx", postings:[]},
-  {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx", postings:[]},
-  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[]},
-  {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx", postings:[]},
-  {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx", postings:[]},
-  {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx", postings:[]},
-  {id:"dirty", company:"Dirty Films", position:"Development Internship", expected:null, note:"Rolling — check monthly. Site has no formal careers page; status unverifiable.", url:"https://dirtyfilms.com", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_DirtyFilms_Development.docx", postings:[]},
-  {id:"lionsgate", company:"Lionsgate", position:"TV Scripted Development Internship", expected:"2027-01-26", note:"Deadline mid–late Feb", url:"https://jobs.lionsgate.com/Lionsgate/go/Lionsgate-Internships/9552700/", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Lionsgate_TVDevelopment.docx", postings:[]},
-  {id:"laika", company:"LAIKA Studios", position:"Production Management Internship", expected:"2027-03-02", note:"You have an internal connection — highest-leverage lead", url:"https://www.laika.com/careers", status:"notopen", lastChecked:"2026-09-12", resumeFile:"files/Ima_Kennerly_Resume_LAIKA.docx", coverFile:"files/Ima_Kennerly_CoverLetter_LAIKA_ProductionManagement.docx", postings:[]},
+  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[]},
+  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"Broad program, Sept–Nov window", url:"https://www.nbcunicareers.com", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", postings:[]},
+  {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx", postings:[]},
+  {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx", postings:[]},
+  {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx", postings:[]},
+  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Accounting & Finance Rotation Program Internship, Summer 2027", url:"https://www.disneycareers.com/en/job/glendale/accounting-and-finance-rotation-program-internship-summer-2027/391/100010094960", found:"2026-09-02"},{title:"Disneyland Resort Industrial Engineering Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/anaheim/disneyland-resort-industrial-engineering-intern-summer-2027/391/100603865040", found:"2026-09-15"},{title:"Walt Disney World Industrial Engineering Intern, Summer/Fall 2027", url:"https://www.disneycareers.com/en/job/bay-lake/walt-disney-world-industrial-engineering-intern-summer-fall-2027/391/100600570368", found:"2026-09-15"}]},
+  {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx", postings:[]},
+  {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx", postings:[]},
+  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[]},
+  {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx", postings:[]},
+  {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx", postings:[]},
+  {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx", postings:[]},
+  {id:"dirty", company:"Dirty Films", position:"Development Internship", expected:null, note:"Rolling — check monthly. Site has no formal careers page; status unverifiable.", url:"https://dirtyfilms.com", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_DirtyFilms_Development.docx", postings:[]},
+  {id:"lionsgate", company:"Lionsgate", position:"TV Scripted Development Internship", expected:"2027-01-26", note:"Deadline mid–late Feb", url:"https://jobs.lionsgate.com/Lionsgate/go/Lionsgate-Internships/9552700/", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Lionsgate_TVDevelopment.docx", postings:[]},
+  {id:"laika", company:"LAIKA Studios", position:"Production Management Internship", expected:"2027-03-02", note:"You have an internal connection — highest-leverage lead", url:"https://www.laika.com/careers", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_LAIKA.docx", coverFile:"files/Ima_Kennerly_CoverLetter_LAIKA_ProductionManagement.docx", postings:[]},
 ];
 /* ==================== END AUTOMATED-CHECK DATA BLOCK ==================== */
 
@@ -1397,9 +1398,18 @@ const MESSAGE_ALERTS = [
    chapter, homework problem set, multi-part project) — not a scraped stat.
    The daily sync task assigns one to every new item it adds (see its
    SKILL.md), so this should stay populated going forward.
-   Last checked: 2026-09-12.
+   Last checked: 2026-09-18.
+   source:"acc-schedule" marks entries taken from ACC 201's authoritative
+   "Course Schedule updated 9/8/2026" document on Blackboard rather than from
+   the Calendar feed — the professor has published these dates but hasn't
+   pushed them to Blackboard's due-dates view yet. When the daily sync later
+   sees a real Blackboard item for the same course+date, it replaces the
+   title with Blackboard's exact wording and drops this marker instead of
+   adding a second row. Titles here follow the "Chapter F:N Homework" pattern
+   Blackboard already uses; the Managerial ones ("Chapter M:N") are a
+   reasoned guess at the same pattern and may need retitling on first sync.
    ====================================================================== */
-const LAST_BLACKBOARD_CHECK = "2026-09-12";
+const LAST_BLACKBOARD_CHECK = "2026-09-18";
 
 const BLACKBOARD_ASSIGNMENTS = [
   {id:"bb-hnr350-1", courseId:"hnr350", title:"Homework, week of Aug 23 — Reading: Visual Culture (Boylan); Writing: Personal Reflective (PR)", date:"2026-08-26", estimatedMinutes:60},
@@ -1420,14 +1430,22 @@ const BLACKBOARD_ASSIGNMENTS = [
   {id:"bb-acc201-2", courseId:"acc201", title:"Chapter F:2 Homework", date:"2026-09-15", estimatedMinutes:45},
   {id:"bb-trf444-1", courseId:"trf444", title:"Modern Family Scheduling Exercise #1", date:"2026-09-16", estimatedMinutes:75},
   {id:"bb-hnr350-6", courseId:"hnr350", title:"Homework, week of Sept 13 — Reading: “Biplane Visualization Takes Flight” (Povinelli); notebook Exercises 10, 13, 14 + Exercise 15 Step 1 (suggested checkpoint; full exercise due Sept 21)", date:"2026-09-16", estimatedMinutes:75},
+  {id:"bb-eee370-7", courseId:"eee370", title:"Quiz #1", date:"2026-09-18", estimatedMinutes:30},
   {id:"bb-eee370-4", courseId:"eee370", title:"InQuizitive: Chapter 4 — Choosing Your Strategy", date:"2026-09-21", estimatedMinutes:30},
   {id:"bb-hnr350-7", courseId:"hnr350", title:"Homework, week of Sept 13 — Exercise 15 (“Biplane Visualization Takes Flight”), Steps 2–4 completed in notebook, ready to present in class", date:"2026-09-21", estimatedMinutes:90},
   {id:"bb-phi311-6", courseId:"phi311", title:"Reading assignment on Descartes' dualism", date:"2026-09-22", estimatedMinutes:30},
+  {id:"bb-hnr350-8", courseId:"hnr350", title:"Homework, week of Sept 20 — Reading: Chapter 4 “Learning to Think Visually”, Experiences in Visual Thinking (McKim), pp. 28–31 (look up the author; note it predates the research on aphantasia); Exercise 4-1 in notebook", date:"2026-09-23", estimatedMinutes:45},
   {id:"bb-eee370-5", courseId:"eee370", title:"InQuizitive: Chapter 5 — Choosing Your Customer", date:"2026-09-28", estimatedMinutes:30},
   {id:"bb-acc201-3", courseId:"acc201", title:"Chapter F:3 Homework", date:"2026-10-01", estimatedMinutes:45},
   {id:"bb-acc201-4", courseId:"acc201", title:"Chapter F:4 Homework", date:"2026-10-06", estimatedMinutes:45},
   {id:"bb-acc201-5", courseId:"acc201", title:"Chapter F:5 Homework", date:"2026-10-22", estimatedMinutes:45},
   {id:"bb-eee370-6", courseId:"eee370", title:"Entrepreneur Interview", date:"2026-10-26", estimatedMinutes:120},
+  {id:"bb-acc201-7", courseId:"acc201", title:"Chapter F:6 Homework", date:"2026-10-29", estimatedMinutes:45, source:"acc-schedule"},
+  {id:"bb-acc201-8", courseId:"acc201", title:"Chapter F:10 Homework", date:"2026-11-03", estimatedMinutes:45, source:"acc-schedule"},
+  {id:"bb-acc201-9", courseId:"acc201", title:"EYARC Assignment", date:"2026-11-12", estimatedMinutes:120, source:"acc-schedule"},
+  {id:"bb-acc201-10", courseId:"acc201", title:"Chapter M:1 Homework", date:"2026-11-19", estimatedMinutes:45, source:"acc-schedule"},
+  {id:"bb-acc201-11", courseId:"acc201", title:"Chapter M:2 Homework", date:"2026-12-03", estimatedMinutes:45, source:"acc-schedule"},
+  {id:"bb-acc201-12", courseId:"acc201", title:"Chapter M:4 Homework", date:"2026-12-08", estimatedMinutes:45, source:"acc-schedule"},
 ];
 
 /* ======================================================================
@@ -1476,7 +1494,7 @@ const COURSE_INFO = {
    syllabus facts and won't be touched by the scheduled task.
    ====================================================================== */
 const SYLLABUS_ASSIGNMENTS = [
-  {id:"syl-acc201-1", courseId:"acc201", title:"Exam 1", date:"2026-09-15"},
+  {id:"syl-acc201-1", courseId:"acc201", title:"Exam 1", date:"2026-09-17"},
   {id:"syl-acc201-2", courseId:"acc201", title:"Exam 2", date:"2026-10-08"},
   {id:"syl-acc201-3", courseId:"acc201", title:"Exam 3", date:"2026-11-05"},
   {id:"syl-acc201-4", courseId:"acc201", title:"Exam 4 (final exam slot, 10:15–12:15 PM)", date:"2026-12-15"},
@@ -1488,10 +1506,10 @@ const SYLLABUS_ASSIGNMENTS = [
   {id:"syl-eee370-6", courseId:"eee370", title:"Business Model Pitch (in class)", date:"2026-12-08"},
   {id:"syl-eee370-7", courseId:"eee370", title:"Original Concept & Business Model Report due", date:"2026-12-11"},
   {id:"syl-hnr350-1", courseId:"hnr350", title:"Final Exam / Research Presentation (univ.-scheduled, 12:45–2:45 PM)", date:"2026-12-14"},
-  {id:"syl-phi311-1", courseId:"phi311", title:"In-class Argument Analysis #1", date:"2026-09-17"},
-  {id:"syl-phi311-2", courseId:"phi311", title:"In-class Argument Analysis #2", date:"2026-10-08"},
-  {id:"syl-phi311-3", courseId:"phi311", title:"In-class Argument Analysis #3", date:"2026-11-05"},
-  {id:"syl-phi311-4", courseId:"phi311", title:"In-class Argument Analysis #4", date:"2026-12-03"},
+  {id:"syl-phi311-1", courseId:"phi311", title:"In-class Argument Analysis #1", date:"2026-09-17", type:"exam"},
+  {id:"syl-phi311-2", courseId:"phi311", title:"In-class Argument Analysis #2", date:"2026-10-08", type:"exam"},
+  {id:"syl-phi311-3", courseId:"phi311", title:"In-class Argument Analysis #3", date:"2026-11-05", type:"exam"},
+  {id:"syl-phi311-4", courseId:"phi311", title:"In-class Argument Analysis #4", date:"2026-12-03", type:"exam"},
   {id:"syl-trf444-1", courseId:"trf444", title:"Production Videos & Party (last regular class day)", date:"2026-12-02"},
   {id:"syl-trf444-2", courseId:"trf444", title:"Final EXAM / Feature Film Presentations due (40 pts)", date:"2026-12-09"},
 ];
@@ -1563,6 +1581,34 @@ const GH_SYNC_REPO = "academic-tracker-data";
 const GH_SYNC_PATH = "data.json";
 const GH_SYNC_BRANCH = "main";
 const GH_TOKEN_KEY = "github-sync-token";      // this device's token, localStorage-only
+
+/* ======================================================================
+   EMBEDDED SYNC TOKEN  —  paste your GitHub token between the quotes on
+   the GH_EMBEDDED_TOKEN line below (it looks like "github_pat_...").
+
+   Why: this is a static file with no server, so something on each device
+   has to prove it's you. Putting the token here means the token travels
+   WITH the file, so every device that opens this file syncs automatically
+   with no per-device setup.
+
+   SECURITY — read before pasting:
+     * Anyone who gets this file gets read/write on the private repo
+       imaadair/academic-tracker-data. That repo holds only this tracker's
+       state — not your GitHub account and not your other repos.
+     * NEVER put this file in a public repo, email it, or share it. GitHub
+       scans public code for tokens and will revoke this one automatically
+       if it ever lands there. That is why this file must not be served
+       from the public imaadair/academic-tracker repo.
+     * To revoke: github.com/settings/personal-access-tokens -> delete
+       "academic-command-center", then paste a new one here.
+     * This token expires 2027-06-30. After that, sync shows an error and
+       the page keeps working normally — generate a new token and replace
+       the value below.
+
+   Leave it as "" to fall back to the old behaviour (paste once per device
+   via the sync panel, stored only in that browser).
+   ====================================================================== */
+const GH_EMBEDDED_TOKEN = "";
 const GH_SHA_KEY = "github-sync-sha-cache";    // last-known remote file SHA, for optimistic concurrency
 
 let ghSyncTimer = null;
@@ -1571,7 +1617,11 @@ let ghSyncInFlight = false;
 let ghSyncSha = localStorage.getItem(GH_SHA_KEY) || null;
 let ghSyncStatus = "idle";         // idle | syncing | error
 
-function ghToken(){ return localStorage.getItem(GH_TOKEN_KEY) || ""; }
+// The embedded token deliberately takes priority over a per-device one:
+// replacing the value above rotates the credential on every device at once,
+// instead of leaving devices stuck on a stale token in their own storage.
+function ghToken(){ return GH_EMBEDDED_TOKEN || localStorage.getItem(GH_TOKEN_KEY) || ""; }
+function ghTokenIsEmbedded(){ return !!GH_EMBEDDED_TOKEN; }
 function ghSyncEnabled(){ return !!ghToken(); }
 
 function ghB64Encode(str){ return btoa(unescape(encodeURIComponent(str))); }
@@ -1594,14 +1644,14 @@ function renderSyncStatus(){
   const statusEl = document.getElementById("syncPanelStatus");
   if(!ghSyncEnabled()){
     if(btn) btn.textContent = "⚙ Sync: Off";
-    if(statusEl) statusEl.textContent = "Not connected on this device.";
+    if(statusEl) statusEl.textContent = "Not connected on this device. Paste a token below, or embed one in the file (see GH_EMBEDDED_TOKEN) to connect every device automatically.";
     return;
   }
   if(btn) btn.textContent = "⚙ Sync: " + (ghSyncStatus === "error" ? "Error" : "On");
   if(statusEl){
     if(ghSyncStatus === "syncing") statusEl.textContent = "Syncing…";
     else if(ghSyncStatus === "error") statusEl.textContent = "Sync error — will retry automatically. Check your token if this persists.";
-    else statusEl.textContent = "Connected. Last synced " + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) + ".";
+    else statusEl.textContent = "Connected" + (ghTokenIsEmbedded() ? " automatically (token embedded in this file — every device that opens it syncs, no setup)" : " on this device") + ". Last synced " + new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) + ".";
   }
 }
 
@@ -1653,24 +1703,52 @@ async function ghApiPut(dataObj, sha){
 // overwritten with the cloud's value so edits from another device appear
 // here. Returns true on a successful pull (whether or not anything changed).
 async function ghSyncPull(){
-  if(!ghSyncEnabled()) return false;
+  if(!ghSyncEnabled()) return {ok:false, changed:false};
   try{
     const {data, sha} = await ghApiGet();
     ghSyncSha = sha;
     if(sha) localStorage.setItem(GH_SHA_KEY, sha);
+    let changed = false;
     for(const key of Object.keys(data)){
       if(ghSyncDirtyKeys.has(key)) continue;
-      if(localStorage.getItem(key) !== data[key]) localStorage.setItem(key, data[key]);
+      if(localStorage.getItem(key) !== data[key]){
+        localStorage.setItem(key, data[key]);
+        changed = true;
+      }
     }
     ghSyncStatus = "idle";
-    return true;
+    return {ok:true, changed};
   }catch(e){
     console.warn("GitHub sync pull failed:", e);
     ghSyncStatus = "error";
     renderSyncStatus();
-    return false;
+    return {ok:false, changed:false};
   }
 }
+
+/* A pull that changed nothing must NOT re-render: rerenderAll() rebuilds
+   every card, and the notes/contact fields only save on blur, so a blind
+   re-render every 45s destroyed whatever was being typed at the time. Even
+   when there IS a real remote change, hold the re-render until the field
+   being edited is done, so a sync from another device can't eat a
+   half-written note. */
+let ghPendingRerender = false;
+
+function ghApplyRemote(res){
+  if(!res || !res.changed) return;
+  const ae = document.activeElement;
+  if(ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA" || ae.isContentEditable)){
+    ghPendingRerender = true;
+    return;
+  }
+  rerenderAll();
+}
+
+document.addEventListener("focusout", ()=>{
+  if(!ghPendingRerender) return;
+  ghPendingRerender = false;
+  setTimeout(rerenderAll, 0); // let the field's own blur handler save first
+});
 
 // Pushes the full current local snapshot to the cloud. On a 409 (someone
 // else pushed since our last known SHA) it pulls fresh state first — using
@@ -1691,7 +1769,7 @@ async function ghSyncPush(isRetry){
     ghSyncInFlight = false;
     if(!isRetry && e.status === 409){
       const pulled = await ghSyncPull();
-      if(pulled){ return ghSyncPush(true); }
+      if(pulled.ok){ return ghSyncPush(true); }
     }
     ghSyncStatus = "error";
   }finally{
@@ -1731,8 +1809,8 @@ document.getElementById("syncSaveBtn").addEventListener("click", async ()=>{
   document.getElementById("syncTokenInput").value = "";
   ghSyncStatus = "syncing";
   renderSyncStatus();
-  const ok = await ghSyncPull();
-  if(ok){
+  const res = await ghSyncPull();
+  if(res.ok){
     rerenderAll();
     ghScheduleSync(); // also push this device's pre-existing local data up
   }
@@ -1740,6 +1818,13 @@ document.getElementById("syncSaveBtn").addEventListener("click", async ()=>{
 });
 document.getElementById("syncClearBtn").addEventListener("click", ()=>{
   localStorage.removeItem(GH_TOKEN_KEY);
+  if(ghTokenIsEmbedded()){
+    // Clearing this browser's copy can't disconnect a token that lives in
+    // the file itself — say so instead of appearing to do nothing.
+    const el = document.getElementById("syncPanelStatus");
+    if(el) el.textContent = "This device's saved token was cleared, but sync stays ON because a token is embedded in the file itself. To disconnect, blank out GH_EMBEDDED_TOKEN near the top of this file's script (or revoke the token on GitHub).";
+    return;
+  }
   clearTimeout(ghSyncTimer);
   ghSyncDirtyKeys.clear();
   ghSyncStatus = "idle";
@@ -2363,6 +2448,10 @@ function assignmentsDueOn(dateIso){
 // alongside it. Matches on title wording, not on which array the item came
 // from, so it still works no matter where an exam/quiz entry is defined.
 function isExamOrQuiz(a){
+  // An explicit type wins: PHI 311's "In-class Argument Analysis" items are
+  // graded exams (10% of the final grade each) but say neither "exam" nor
+  // "quiz", so the title regex alone would render them as ordinary homework.
+  if(a.type === "exam") return true;
   return /\bexam\b|\bquiz\b|\bmidterm\b/i.test(a.title);
 }
 function isoDate(d){
@@ -3025,10 +3114,10 @@ renderThesis();
 // whenever the tab regains focus, so edits made on another device show up
 // without needing a manual reload.
 renderSyncStatus();
-ghSyncPull().then(ok => { if(ok) rerenderAll(); renderSyncStatus(); });
-setInterval(()=>{ ghSyncPull().then(ok => { if(ok) rerenderAll(); }); }, 45000);
+ghSyncPull().then(res => { ghApplyRemote(res); renderSyncStatus(); });
+setInterval(()=>{ ghSyncPull().then(ghApplyRemote); }, 45000);
 document.addEventListener("visibilitychange", ()=>{
-  if(document.visibilityState === "visible") ghSyncPull().then(ok => { if(ok) rerenderAll(); });
+  if(document.visibilityState === "visible") ghSyncPull().then(ghApplyRemote);
 });
 </script>
 
