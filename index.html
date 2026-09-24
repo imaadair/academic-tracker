@@ -150,6 +150,47 @@
     border:1px solid var(--hairline);
     border-radius:var(--radius);
   }
+  .thesis-ref{
+    margin:10px auto 0;
+    background:#1F1F1C;
+    border:1px solid var(--hairline);
+    border-radius:var(--radius);
+  }
+  .thesis-ref > summary{
+    cursor:pointer;
+    padding:12px 1in;
+    font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase;
+    font-size:11px;
+    letter-spacing:0.08em;
+    color:var(--ink-dim);
+    list-style:none;
+  }
+  .thesis-ref > summary::-webkit-details-marker{display:none;}
+  .thesis-ref > summary::before{content:"+ ";color:var(--yellow);}
+  .thesis-ref[open] > summary::before{content:"- ";}
+  .thesis-ref[open] > summary{color:var(--ink);border-bottom:1px dashed var(--hairline);}
+  .thesis-ref-body{padding:14px 1in 18px;font-size:13px;line-height:1.6;}
+  .thesis-ref-body ul,.thesis-ref-body ol{margin:8px 0;padding-left:20px;}
+  .thesis-ref-body li{margin-bottom:6px;}
+  .thesis-ref-body h4{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--yellow);
+    margin:14px 0 6px;
+  }
+  .thesis-ref-body table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0;}
+  .thesis-ref-body th,.thesis-ref-body td{
+    text-align:left;padding:7px 9px;border:1px solid var(--hairline);vertical-align:top;
+  }
+  .thesis-ref-body th{color:var(--ink-dim);font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;}
+  .thesis-flag{color:var(--red-bright);font-weight:600;}
+  .req-group-title{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;
+    letter-spacing:0.06em;color:var(--yellow);margin:12px 0 8px;
+  }
   .docs-title{
     font-family:'IBM Plex Mono',monospace;
     text-transform:uppercase;
@@ -1145,9 +1186,12 @@
 <div class="section-divider" id="thesis">
   <div class="scene-tag">Scene 6</div>
   <h2>Honors Thesis</h2>
-  <div class="section-sub">Seeded from the Renée Crown Honors Program's published timeline — adjust to your actual dates</div>
+  <div class="section-sub">Honors Thesis + Newhouse Capstone master plan — one documentary satisfying both offices. Dr. Murphy confirmed as second reader; Newhouse thesis director still open (critical path).</div>
 </div>
 <div class="grid" id="thesisGrid"></div>
+<div class="docs-panel" id="thesisStrategy"></div>
+<div class="docs-panel" id="thesisRequirements"></div>
+<div id="thesisReference"></div>
 
 <div class="footer-note">
   <b>Folder structure needed:</b> for the Resume/Cover letter links on each card to work, keep this file alongside a <code>files/</code> subfolder containing all your resumes, cover letters, and <code>Ima_Kennerly_References.docx</code> — that's where they currently live.
@@ -1156,7 +1200,7 @@
   <br><br>
   <b>Applying:</b> click "Apply / careers page" to open the real posting, with Resume/Cover letter open in adjacent tabs. If you have <b>Claude in Chrome</b> installed, it can help fill the application form from those documents once you're on the page — it will still show you every field before anything is submitted.
   <br><br>
-  <b>School Deadlines, Career Tasks, Contacts, and Honors Thesis:</b> these are new sections. Deadlines and thesis milestones are seeded from Syracuse's official calendar and the Honors Program's published timeline — check off tasks, add your own deadlines/tasks, and log contacts as you go. Everything you add is saved in this browser (not synced elsewhere), so keep opening this same file in the same browser.
+  <b>School Deadlines, Career Tasks, Contacts, and Honors Thesis:</b> these are new sections. School Deadlines are seeded from Syracuse's official academic calendar. The Honors Thesis section is written from your own Honors Thesis + Newhouse Capstone master plan — milestone cards, a graduation-requirements checklist, and collapsible reference panels (deliverable outline, story-selection filters, funding, risk log, models to study, and what the proposal must contain). Check off tasks, add your own deadlines/tasks, and log contacts as you go. Everything you add is saved in this browser (not synced elsewhere), so keep opening this same file in the same browser.
   <br><br>
   <b>Blackboard sync:</b> a daily Claude Code scheduled task ("Daily Blackboard sync — Academic Command Center", <b>7am daily</b>) logs into Blackboard through Ima's already-signed-in Chrome, reads the Calendar's "Due Dates" view (and HNR 350's Announcements tab) for all six courses, and updates the <code>BLACKBOARD_ASSIGNMENTS</code> block directly — new due dates show up under each course in the Study Center, on the School Deadlines calendar, and as badges on the weekly schedule, tagged "(auto)". Reopen or refresh this file after each run to see what's new. If a course shows nothing, its professor hasn't posted due dates on Blackboard yet. The sync needs a live Syracuse SSO session in Chrome: if it is asked for a password it stops and reports instead of editing anything, so an occasional run may need you to sign in first.
   <br><br>
@@ -1185,24 +1229,24 @@
    Do not remove or rename any fields — the page reads them directly.
    "position" is now just a focus label; it no longer limits what counts.
    ====================================================================== */
-const LAST_AUTO_CHECK = "2026-09-15";
+const LAST_AUTO_CHECK = "2026-09-24";
 
 const COMPANIES = [
-  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[]},
-  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"Broad program, Sept–Nov window", url:"https://www.nbcunicareers.com", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", postings:[]},
-  {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx", postings:[]},
-  {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx", postings:[]},
-  {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx", postings:[]},
-  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Accounting & Finance Rotation Program Internship, Summer 2027", url:"https://www.disneycareers.com/en/job/glendale/accounting-and-finance-rotation-program-internship-summer-2027/391/100010094960", found:"2026-09-02"},{title:"Disneyland Resort Industrial Engineering Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/anaheim/disneyland-resort-industrial-engineering-intern-summer-2027/391/100603865040", found:"2026-09-15"},{title:"Walt Disney World Industrial Engineering Intern, Summer/Fall 2027", url:"https://www.disneycareers.com/en/job/bay-lake/walt-disney-world-industrial-engineering-intern-summer-fall-2027/391/100600570368", found:"2026-09-15"}]},
-  {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx", postings:[]},
-  {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx", postings:[]},
-  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[]},
-  {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx", postings:[]},
-  {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx", postings:[]},
-  {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx", postings:[]},
-  {id:"dirty", company:"Dirty Films", position:"Development Internship", expected:null, note:"Rolling — check monthly. Site has no formal careers page; status unverifiable.", url:"https://dirtyfilms.com", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_DirtyFilms_Development.docx", postings:[]},
-  {id:"lionsgate", company:"Lionsgate", position:"TV Scripted Development Internship", expected:"2027-01-26", note:"Deadline mid–late Feb", url:"https://jobs.lionsgate.com/Lionsgate/go/Lionsgate-Internships/9552700/", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Lionsgate_TVDevelopment.docx", postings:[]},
-  {id:"laika", company:"LAIKA Studios", position:"Production Management Internship", expected:"2027-03-02", note:"You have an internal connection — highest-leverage lead", url:"https://www.laika.com/careers", status:"notopen", lastChecked:"2026-09-15", resumeFile:"files/Ima_Kennerly_Resume_LAIKA.docx", coverFile:"files/Ima_Kennerly_CoverLetter_LAIKA_ProductionManagement.docx", postings:[]},
+  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[]},
+  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"Broad program, Sept–Nov window", url:"https://www.nbcunicareers.com", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", postings:[]},
+  {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx", postings:[]},
+  {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx", postings:[]},
+  {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx", postings:[]},
+  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Accounting & Finance Rotation Program Internship, Summer 2027", url:"https://www.disneycareers.com/en/job/burbank/accounting-and-finance-rotation-program-internship-summer-2027/391/100010094960", found:"2026-09-02"},{title:"Disneyland Resort Industrial Engineering Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/anaheim/disneyland-resort-industrial-engineering-intern-summer-2027/391/100603865040", found:"2026-09-15"},{title:"Walt Disney World Industrial Engineering Intern, Summer/Fall 2027", url:"https://www.disneycareers.com/en/job/bay-lake/walt-disney-world-industrial-engineering-intern-summer-fall-2027/391/100600570368", found:"2026-09-15"}]},
+  {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx", postings:[]},
+  {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx", postings:[]},
+  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[]},
+  {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx", postings:[]},
+  {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx", postings:[]},
+  {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx", postings:[]},
+  {id:"dirty", company:"Dirty Films", position:"Development Internship", expected:null, note:"Rolling — check monthly. Site has no formal careers page; status unverifiable.", url:"https://dirtyfilms.com", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_DirtyFilms_Development.docx", postings:[]},
+  {id:"lionsgate", company:"Lionsgate", position:"TV Scripted Development Internship", expected:"2027-01-26", note:"Deadline mid–late Feb", url:"https://jobs.lionsgate.com/Lionsgate/go/Lionsgate-Internships/9552700/", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Lionsgate_TVDevelopment.docx", postings:[]},
+  {id:"laika", company:"LAIKA Studios", position:"Production Management Internship", expected:"2027-03-02", note:"You have an internal connection — highest-leverage lead", url:"https://www.laika.com/careers", status:"notopen", lastChecked:"2026-09-24", resumeFile:"files/Ima_Kennerly_Resume_LAIKA.docx", coverFile:"files/Ima_Kennerly_CoverLetter_LAIKA_ProductionManagement.docx", postings:[]},
 ];
 /* ==================== END AUTOMATED-CHECK DATA BLOCK ==================== */
 
@@ -1247,16 +1291,69 @@ const CAREER_TASKS_SEED = [
 ];
 
 /* ======================================================================
-   HONORS THESIS DATA BLOCK — seeded from the Renée Crown Honors Program's
-   published timeline (honors.syr.edu). The proposal deadline (Apr 15) and
-   Presentation Day date are the program's standard pattern — adjust status/
-   dates to match your actual advisor and cohort timeline.
+   HONORS THESIS / NEWHOUSE CAPSTONE DATA BLOCK
+   Written from Ima's own "Honors Thesis + Newhouse Capstone Master Plan"
+   (documentary drawn from the St. Lucia archival research with Dr. Murphy).
+   Replaces the earlier placeholder timeline, which was guessed from the
+   Crown Honors published pattern.
+
+   Core strategy from the plan: this is ONE project, not two. Newhouse's
+   Honors Capstone Project course (TRF 499 is the TRF version) exists so an
+   Honors thesis counts as the major capstone — so the job is two approvals
+   on one documentary, with a Newhouse faculty thesis director plus Dr.
+   Murphy as second reader (which also satisfies Crown's graded
+   interdisciplinarity requirement).
+
+   ASSUMPTIONS THE PLAN FLAGS AS UNVERIFIED — confirm these, they change
+   course numbers and dates:
+     * Class year: assumes junior now (Fall 2026), graduating Spring 2028.
+     * Major: assumes TRF. If Broadcast/Digital Journalism, Magazine, or
+       Visual Comm, the strategy holds but the capstone course number and
+       coordinator differ.
+     * "POS registers" read as Protector of Slaves registers, St. Lucia
+       1824-1834 (UK National Archives CO 258).
+   Dates marked "target" are the plan's own self-set deadlines, not Crown
+   deadlines. Crown/department/funding dates shift year to year — confirm
+   with the Honors advisor and department coordinator before relying on them.
+   Ids are reused from the old block where the meaning matches, so any notes
+   already typed into those cards survive.
    ====================================================================== */
 const HONORS_THESIS = [
-  {id:"advisor", title:"Confirm / check in with thesis advisor", date:null, status:"notstarted", note:""},
-  {id:"proposal", title:"Honors thesis proposal due", date:"2027-04-15", status:"notstarted", note:"Standard deadline is April 15 of junior year — adjust if this isn't your year"},
-  {id:"draft", title:"First full draft to advisor", date:null, status:"notstarted", note:"Set your own target date"},
-  {id:"presentation", title:"Honors Thesis Presentation Day (Spring)", date:"2027-04-29", status:"notstarted", note:"Exact date TBD for 2027 — 2026's was Apr 29; watch honors.syr.edu for the announcement"},
+  // ---- Fall 2026: critical path is finding the Newhouse director ----
+  {id:"advisor", title:"Recruit Newhouse faculty thesis director / capstone advisor", date:null, status:"notstarted", note:"TOP OPEN TASK / critical path. Must be Newhouse faculty since this doubles as the department capstone. Look for someone who has advised documentary or archival/historical media work. Leads: ask Dr. Murphy who at Newhouse does archival-adjacent work; check advisors on the SURFACE capstone archive; ask the undergrad coordinator who advises nonfiction capstones; whoever teaches TRF 462 Documentary."},
+  {id:"reader", title:"Second reader confirmed — Dr. Murphy", date:null, status:"done", note:"Confirmed. Brings the historical/archival rigor and keeps the project honest to the source material. Newhouse x History pairing is what satisfies Crown's interdisciplinarity requirement — lean into it in the proposal."},
+  {id:"capstone-consent", title:"Written consent to use capstone as the thesis (Capstone Plus)", date:null, status:"notstarted", note:"Crown requires the Newhouse advisor to explicitly consent to the capstone doubling as the Honors thesis. An email is fine. Also: the thesis cannot be a 1:1 copy of the capstone — name your specific individual contribution in the proposal (e.g. director + sole author of the written thesis)."},
+  {id:"capstone-course", title:"Ask dept. coordinator: capstone course number, credits, internal deadline", date:null, status:"notstarted", note:"Need the Honors Capstone Project course number (TRF 499 if TRF), its credit structure across semesters, and when the department wants an internal capstone proposal — which may be earlier than Crown's April 15."},
+  {id:"la-confirm", title:"Get Newhouse LA + dept. sign-off in writing (do now)", date:null, status:"notstarted", note:"Email newhousela@syr.edu and the department coordinator: (a) can capstone requirements finish before departure, (b) will Crown allow remote submission if anything slips into spring 2028. Plan says get this in writing early — do not assume."},
+  {id:"honors-audit", title:"Pull personal Honors requirements audit", date:null, status:"notstarted", note:"From the Honors advisor. Establishes what is actually done vs outstanding for breadth credits, civic engagement hours, and collaborative capacity."},
+  {id:"story-shortlist", title:"Narrow archive to 3-5 candidate stories + story bible", date:null, status:"notstarted", note:"Target Oct-Dec 2026. Filters from the plan: traceability of one named person across multiple entries; a present-day filmable anchor in St. Lucia; honesty about what the record can verify vs only suggest; ethical weight — centre agency and specificity, not only suffering."},
+  {id:"historiography", title:"Read 2-3 secondary sources on Protector of Slaves / Caribbean slavery archives", date:null, status:"notstarted", note:"So the proposal shows command of the historiography, not just awareness that an archive exists. Murphy can point to the key scholarship."},
+
+  // ---- Spring 2027: the two proposals ----
+  {id:"funding", title:"Crown Thesis Funding application (up to $7,500)", date:"2027-03-01", status:"notstarted", note:"Hard Crown deadline March 1. Important: the funding application can ALSO serve as the Junior Thesis Proposal — tell Honors you want it to count as both, and you avoid writing two documents. Also ask about the Academic Enhancement Award (up to $2,000) for summer travel."},
+  {id:"proposal", title:"Junior Thesis Proposal due to Crown", date:"2027-04-15", status:"notstarted", note:"Five sections: I Working title; II Introduction (name both fields — documentary production and Caribbean/Atlantic history — plus existing scholarship and the gap a documentary fills); III Study design (archival method + documentary method side by side; IRB question settled BEFORE submitting, not after); IV References (CO 258, secondary scholarship, St. Lucian archival bodies, people); V Timeline that explicitly accounts for the Newhouse LA semester."},
+  {id:"dept-proposal", title:"Department capstone proposal", date:null, status:"notstarted", note:"Separate from Crown's. Confirm the internal deadline — plan around whichever is earlier. TRF's tends to land in spring of junior year."},
+  {id:"capstone-credit", title:"Register for first Honors Capstone Project credit", date:null, status:"notstarted", note:"Spring 2027. Course typically runs across 1-3 semesters (SURFACE describes capstones as typically four semesters), faculty-supervised."},
+  {id:"irb", title:"IRB / human-subjects approval", date:null, status:"notstarted", note:"Start spring 2027, NOT summer — it takes weeks. Required if interviewing living people, including descendants, historians, or St. Lucian community members. Settle the IRB question with the director before submitting the Crown proposal."},
+  {id:"story-lock", title:"Lock ONE story + shooting outline; line up crew", date:"2027-04-15", status:"notstarted", note:"Keep 2 backup story candidates through spring 2027 in case the chosen one proves undocumentable beyond a thin record. If using a crew (cinematographer/sound/editor), get it pre-approved by Honors as the collaborative-capacity project BEFORE starting."},
+  {id:"travel-logistics", title:"Book St. Lucia travel + archive access", date:null, status:"notstarted", note:"If funded: flights, local contacts/fixer, archive access permissions, visas. Confirm reproduction/citation permissions for UK National Archives material (or copies via Dr. Murphy's project) early."},
+
+  // ---- Summer 2027: production ----
+  {id:"production", title:"Field production — St. Lucia", date:null, status:"notstarted", note:"Summer 2027. Filming, archive photography/scans, interviews. Back up footage in at least two places immediately, every day. Log footage as you go — do not wait until fall. Fallback if travel funding fails: digitized archive material + remote interviews."},
+
+  // ---- Fall 2027: senior fall, front-load everything ----
+  {id:"la-app", title:"Newhouse LA application for spring 2028", date:"2027-09-15", status:"notstarted", note:"Hard deadline Sept 15, 2027."},
+  {id:"enroll-senior", title:"Enroll in capstone course + thesis credit hours", date:null, status:"notstarted", note:"Fall 2027."},
+  {id:"rough-cut", title:"Rough assembly cut + advisor feedback", date:null, status:"notstarted", note:"Target ~October 2027. Write the historical-context and methodology chapters in parallel with editing rather than after."},
+  {id:"draft", title:"Written thesis draft complete", date:"2027-12-15", status:"notstarted", note:"Plan's own target: complete before winter break senior year. Roughly 25-45 pages is typical for a production-based Newhouse/Crown thesis. Structure: abstract; intro; historical context/lit review (8-12pp, where Murphy matters most); methodology; the filmmaking process (6-10pp); reflection; conclusion; bibliography + appendices."},
+  {id:"lock-picture", title:"Lock picture (final cut)", date:"2027-12-15", status:"notstarted", note:"Plan's own target: before winter break. Film is typically 10-20 min for a Newhouse capstone documentary. Then sound/colour pass."},
+  {id:"presentation", title:"Thesis defense / department capstone review", date:"2027-12-15", status:"notstarted", note:"Hold this in Dec 2027 or the first week of Jan 2028 — BEFORE leaving for LA. Crown runs a Thesis Presentation Day each semester; confirm the exact date with Honors. This is the single biggest scheduling risk in the plan: spring 2028 is your thesis-due semester AND you will be 2,500 miles from campus, advisors and edit bays."},
+
+  // ---- Spring 2028: wrap-up only, from Newhouse LA ----
+  {id:"crown-submit", title:"Final formatting, signatures, official Crown submission", date:null, status:"notstarted", note:"Spring 2028, from LA. Treat this semester as polish and paperwork only — not production."},
+  {id:"surface", title:"Deliver final files to department / SURFACE archive", date:null, status:"notstarted", note:"Spring 2028."},
+  {id:"clearance", title:"Confirm graduation clearance with Honors + Newhouse", date:null, status:"notstarted", note:"Spring 2028."},
+
 ];
 
 /* ======================================================================
@@ -1271,6 +1368,186 @@ const COURSES = [
   {id:"trf444", code:"TRF 444", title:"Production Management", term:"Fall 2026", credits:3, color:"#8B6BC7"},
   {id:"trf340", code:"TRF 340", title:"Topics in CritHist Perspectvs (Television in the Network Age: 1947-1981)", term:"Fall 2026", credits:3, color:"#5E78C9"},
   {id:"phi311", code:"PHI 311", title:"The Rationalists", term:"Fall 2026", credits:3, color:"#4F9E6E"},
+];
+
+/* ======================================================================
+   THESIS REQUIREMENTS CHECKLIST — the full graduation checklist from the
+   master plan. Separate from HONORS_THESIS above: those are dated,
+   sequenced milestones; these are binary done/not-done gates that have to
+   be satisfied by graduation regardless of how the project itself goes.
+   Tick state persists per item under "thesisreq-<id>" and syncs.
+   ====================================================================== */
+const THESIS_REQUIREMENTS = [
+  {group:"Renée Crown University Honors Program — all required by graduation", items:[
+    {id:"breadth", label:"Breadth: 12 Honors credits", note:"2 HNR-prefix courses (6 cr.) + 2 more Honors courses/sections (6 cr.). HNR 350 this term counts — verify against your audit."},
+    {id:"interdisc", label:"Interdisciplinarity", note:"The thesis itself must be clearly interdisciplinary, and this is GRADED. Newhouse (production) × History (archival research) satisfies it well — argue it explicitly in the proposal rather than leaving it implied."},
+    {id:"civic", label:"Civic engagement: 50 documented hours", note:"Independent of the thesis. Check current hours on your Honors audit."},
+    {id:"collab", label:"Collaborative capacity", note:"A substantial team project. A documentary crew (cinematographer, sound, editor) can satisfy this — but only if pre-approved by Honors BEFORE you start."},
+    {id:"global", label:"Global awareness", note:"International/global-context work. Travel to, or deep engagement with, St. Lucia is a natural fit."},
+    {id:"language", label:"Command of language", note:"Check your individual audit — often already satisfied by existing coursework or placement."},
+    {id:"director-reader", label:"Approved thesis director + second reader", note:"Director must be a full faculty member in your field (Newhouse, since this doubles as the capstone). Second reader: Dr. Murphy, confirmed."},
+    {id:"gpa", label:"GPA at the cum laude threshold", note:"3.4 for Newhouse."},
+  ]},
+  {group:"Newhouse capstone — confirm exact numbers with your undergrad coordinator", items:[
+    {id:"capstone-enroll", label:"Enrolled in the department's Honors Capstone Project course", note:"TRF 499 is the TRF version. Typically taken across 1–3 semesters (SURFACE describes capstones as often four), faculty-supervised."},
+    {id:"capstone-prop", label:"Capstone proposal submitted to the department", note:"Separate from Crown's proposal. Ask your department when their internal deadline is — TRF's tends to land in spring of junior year."},
+    {id:"capstone-deliver", label:"Final deliverable + any department screening/exhibition", note:"Confirm whether your department requires a public screening."},
+  ]},
+];
+
+/* ======================================================================
+   THESIS REFERENCE — the non-milestone content of the master plan, kept
+   here so the plan lives in one place instead of in a separate document.
+   Rendered as collapsible panels under the milestone cards.
+   ====================================================================== */
+const THESIS_REFERENCE = [
+  {id:"ref-risk", title:"⚠ The one real scheduling risk — read before planning anything else", open:true, html:`
+    <p><span class="thesis-flag">Newhouse LA in spring of senior year means your last semester is also your thesis-due semester</span> — while you are 2,500+ miles from campus, your advisors, your edit bays, and Crown's on-campus thesis events (Crown runs a Thesis Presentation Day each semester).</p>
+    <p>That is not a reason to drop the LA plan. It is a reason to sequence everything so spring 2028 is <b>wrap-up only</b>, not core production:</p>
+    <ul>
+      <li>Lock picture and have a complete written draft <b>before winter break senior year</b> (by December 2027).</li>
+      <li>Hold the defense / department capstone review in <b>December 2027 or the first week of January 2028</b>, before leaving.</li>
+      <li>Treat spring 2028 as final polish, Crown paperwork, and the internship — not "still filming."</li>
+      <li>Email <b>newhousela@syr.edu</b> and your department coordinator <b>now</b> to confirm (a) they will let you finish capstone requirements before departure, and (b) whether Crown allows remote submission if anything slips. Get it in writing — do not assume.</li>
+    </ul>`},
+
+  {id:"ref-outline", title:"What the thesis actually looks like — deliverable outline", html:`
+    <p>Newhouse/Crown documentary theses are not one fixed format; examples range from a traditional research paper to a short reflective essay accompanying a film. This structure fits an archival-history + produced-documentary pairing. A starting outline, not a locked template — your director and Murphy will have opinions.</p>
+    <h4>Part A — The film</h4>
+    <p>Whatever length serves the story; <b>10–20 minutes</b> is typical for a Newhouse capstone documentary.</p>
+    <h4>Part B — The written thesis (~25–45 pages)</h4>
+    <p>Shorter than a pure-research thesis because the film carries much of the argument.</p>
+    <ol>
+      <li><b>Abstract</b> (1 p.) — one paragraph on the story, one on why it matters, one on the interdisciplinary approach.</li>
+      <li><b>Introduction</b> (3–5 pp.) — the story and why you chose it; why it matters now, connecting the 1820s–30s St. Lucia archive to something a present-day audience should care about; how history and documentary filmmaking talk to each other here.</li>
+      <li><b>Historical context / literature review</b> (8–12 pp.) — <i>where Murphy's guidance matters most.</i> What the Protector of Slaves registers are, how they were created, and their limits as a source (they were compiled <i>by</i> colonial authorities — say so plainly). What historians have done with this kind of record. The specific thread you follow, and exactly what the archive does and does not tell you.</li>
+      <li><b>Methodology</b> (4–6 pp.) — archival method (how you searched, what you found, what you could not find); documentary method (how you decided what to film, who you interviewed, how you handled gaps — dramatization? narration? silence?); ethical approach to sensitive material and to St. Lucian communities or descendants.</li>
+      <li><b>The filmmaking process</b> (6–10 pp.) — pre-production decisions and why; what changed in the field; structural choices in the edit and what you cut; specific craft problems and how you solved them.</li>
+      <li><b>Reflection / critical analysis</b> (4–6 pp.) — what the film does and does not accomplish; what you would do differently; how it connects to your future work.</li>
+      <li><b>Conclusion</b> (2–3 pp.)</li>
+      <li><b>Bibliography + appendices</b> — transcripts, shot list, interview list, archival citations.</li>
+    </ol>`},
+
+  {id:"ref-pipeline", title:"Documentary pipeline — development to delivery", html:`
+    <ol>
+      <li><b>Development</b> (fall 2026–spring 2027) — archive research → story selection → treatment/outline → subject and interview list → funding application.</li>
+      <li><b>Pre-production</b> (spring–early summer 2027) — shot list, crew, gear, travel and access logistics, releases and consent forms, IRB if needed.</li>
+      <li><b>Production</b> (summer 2027, possibly a supplemental fall shoot) — principal filming, archival photography/scans, interviews.</li>
+      <li><b>Post-production</b> (fall 2027–winter break) — assembly cut → rough cut → advisor feedback → fine cut → locked picture → sound and colour.</li>
+      <li><b>Written component</b> (parallel to post, fall–winter 2027) — historical context, methodology, the argument for why this story matters, reflection on the process. <i>This is what makes it a thesis and not just a film.</i></li>
+      <li><b>Defense / review</b> (Dec 2027–early Jan 2028) — thesis committee and/or department capstone panel.</li>
+      <li><b>Delivery</b> (spring 2028) — final files, formatted written thesis, submission to Crown and the Newhouse archive.</li>
+    </ol>`},
+
+  {id:"ref-story", title:"Choosing your story from the archive", html:`
+    <p>You will have more possible stories than you can tell. Filters to narrow fast:</p>
+    <ul>
+      <li><b>Traceability</b> — can you follow one named person (or a small connected group) across multiple entries: a complaint, a later record, a manumission, a family connection? A traceable thread beats a single isolated entry.</li>
+      <li><b>Visual / present-day anchor</b> — is there a place in St. Lucia today connected to the record (a plantation site, a parish, a family that may still be there) that gives you something to film in the present, not just archival stills?</li>
+      <li><b>Verify vs. speculate</b> — be honest in the treatment about the limits of the record. Good historical documentary work names its evidentiary gaps rather than papering over them.</li>
+      <li><b>Ethical weight</b> — this is source material about real people who suffered under slavery. Centre their agency and specificity rather than only their suffering. If filming in St. Lucia, plan to consult local historians, archivists, or descendant community members rather than treating the island as backdrop.</li>
+    </ul>`},
+
+  {id:"ref-team", title:"Your team — and how to find the Newhouse advisor", html:`
+    <ul>
+      <li><b>Thesis director / capstone advisor — STILL OPEN, critical path.</b> Must be Newhouse faculty, since this is also the department capstone.</li>
+      <li><b>Second reader — CONFIRMED: Dr. Murphy.</b> Brings historical and archival rigour; keeps the project honest to the source material.</li>
+      <li><b>Department capstone advisor</b> — likely the same person as the thesis director, since it is one project. Confirm with the undergrad coordinator that one faculty member can hold both roles.</li>
+      <li><b>Crew</b> (optional, useful for collaborative capacity) — cinematographer, sound recordist, editor. Pre-approve any team arrangement with Honors before beginning.</li>
+    </ul>
+    <h4>Finding the right person</h4>
+    <p>Look for someone who has advised documentary or archival/historical media projects — you want someone who will not blink at "the primary source is a 200-year-old colonial register."</p>
+    <ul>
+      <li>Ask Dr. Murphy directly; she may already know who at Newhouse does historical/archival-adjacent media work.</li>
+      <li>Check who advised the documentary theses in the models panel below — advisor names appear in the SURFACE archive — then check whether they are still on faculty.</li>
+      <li>Ask your department's undergrad coordinator who typically advises documentary or nonfiction capstones.</li>
+      <li>Whoever teaches <b>TRF 462 Documentary</b> and the post-production/capstone courses is worth approaching first.</li>
+    </ul>`},
+
+  {id:"ref-funding", title:"Funding & logistics to sort out early", html:`
+    <ul>
+      <li><b>Crown Thesis Funding</b> — up to <b>$7,500</b> toward research costs, due <b>March 1</b> of junior year (March 1, 2027). <span class="thesis-flag">A funding application can also serve as your Junior Thesis Proposal</span> — tell Honors you want it to count as both and you avoid writing two documents.</li>
+      <li><b>Academic Enhancement Award</b> — up to <b>$2,000</b>, same office, for study abroad / research / professional development.</li>
+      <li><b>IRB / human subjects approval</b> — required if you interview living people. Start spring 2027, not summer; it can take weeks.</li>
+      <li><b>Archive access</b> — if using UK National Archives material (or copies via Dr. Murphy's project), confirm reproduction and citation permissions early.</li>
+      <li><b>Newhouse LA</b> — application due <b>Sept. 15, 2027</b> for spring 2028. Confirm capstone/thesis completion expectations with the LA program office before committing.</li>
+    </ul>`},
+
+  {id:"ref-risklog", title:"Risk log", html:`
+    <table>
+      <tr><th>Risk</th><th>Mitigation</th></tr>
+      <tr><td>Thesis/capstone work bleeds into spring 2028 while you are in LA</td><td>Front-load: lock picture and finish writing by winter break senior year</td></tr>
+      <tr><td>Newhouse advisor takes time to find and confirm</td><td>Start now — this is the critical path item</td></tr>
+      <tr><td>Travel funding falls through</td><td>Apply to multiple sources early; back-up plan using digitized archive material + remote interviews</td></tr>
+      <tr><td>Chosen story proves undocumentable beyond one thin record</td><td>Narrow to a final story only after a real feasibility pass; keep 2 backup candidates through spring 2027</td></tr>
+      <tr><td>IRB delays the interview timeline</td><td>Start the IRB conversation in spring 2027, well before summer production</td></tr>
+      <tr><td>Newhouse LA courses conflict with capstone enrollment</td><td>Email the department and LA program office this semester, before applying</td></tr>
+    </table>`},
+
+  {id:"ref-models", title:"Models to study — real Newhouse/Crown capstones", html:`
+    <p>Your project sits closest to Group A and Group C combined: a single traceable historical thread told through documentary craft, with a research-driven framing.</p>
+    <h4>Group A — archival/historical research through immersive media (closest to yours)</h4>
+    <ul>
+      <li><b><a href="https://visualizing81.thenewshouse.com/" target="_blank">Visualizing 81</a></b> — Amanda Paule (Magazine, News &amp; Digital Journalism). <span class="thesis-flag">Your single best model — read it in full.</span> A 1951 Black travel guide's addresses mapped against the present-day city, archival photographs, oral history from former residents, and 360°/photogrammetry capture, telling the story of a neighbourhood destroyed by urban renewal. Built in distinct chapters, blends past and present visually, centres living community voices rather than only the archive. Same move you are making, different archive and era. <a href="https://surface.syr.edu/cgi/viewcontent.cgi?article=2333&amp;context=honors_capstone" target="_blank">Written thesis PDF</a>.</li>
+      <li><b>"How a work changes in response to the work itself: Researching Civil War Photography"</b> — Rose Margolis (TRF). Case study of a single historical visual archive; useful for structuring the research-methodology chapter.</li>
+    </ul>
+    <h4>Group B — character/story-driven documentary (model for film craft)</h4>
+    <ul>
+      <li><b>"A Walk in the Dark"</b> — TRF senior capstone, 34 min, built entirely around one subject's specific traceable story rather than a broad topic. Close to the scale and intimacy of one figure traced through the register.</li>
+      <li><b>"After the Ashes"</b> — Jess Van (TRF/photography), a tight single-subject nonfiction film built around a person and a place.</li>
+      <li><b>"The Lovely Invader: A Documentary on Lonicera Research"</b> — Danielle Houghton (TRF). Shows a documentary can be built around research itself as the subject — relevant if you want Murphy's or your own research process on camera.</li>
+    </ul>
+    <h4>Group C — process-reflection written thesis (model for your written component)</h4>
+    <ul>
+      <li><b>"The Toll We Let it Take"</b> — TRF Honors capstone whose written thesis is a first-person account of the student's specific creative role, including advisor feedback and craft tradeoffs. Reads like a filmmaker's production diary with critical distance, not a dry academic paper. <a href="https://surface.syr.edu/cgi/viewcontent.cgi?article=2359&amp;context=honors_capstone" target="_blank">PDF</a>.</li>
+    </ul>
+    <h4>Group D — screenplay/fiction route (not your path)</h4>
+    <ul>
+      <li><b>"Elsie: A Screenplay"</b> — Eileen Spath (TRF). Included to show how wide "creative capstone" stretches at Newhouse, in case anyone questions the project's scope.</li>
+    </ul>
+    <p><b>What to do with these:</b> pull the full PDFs for <i>Visualizing 81</i> and <i>The Toll We Let it Take</i> from <a href="https://surface.syr.edu/trf_hcapstone/" target="_blank">SURFACE</a>, skim their written components for structure and tone, and bring both to your first real planning meeting once you have a director. Showing up with "here is the model I am building toward" beats showing up with an idea.</p>`},
+
+  {id:"ref-proposal", title:"What the Thesis Proposal must contain (due Apr 15, 2027)", html:`
+    <p>Crown's form has five sections. What each means for this project:</p>
+    <h4>I. Working title</h4>
+    <p>Need not be final. Something like <i>"[Working Title]: A Documentary on [Individual/Case] from the St. Lucia Protector of Slaves Registers."</i></p>
+    <h4>II. Introduction</h4>
+    <ul>
+      <li>What the project is — plain-language description of the story, the archive, and what you are arguing or exploring.</li>
+      <li>How it fits your fields — name both explicitly: documentary production (Newhouse) and Caribbean/Atlantic history.</li>
+      <li>Existing scholarship — what has been written using Protector of Slaves records or similar archives (Murphy can point to key sources), and what is missing. This is where you justify why a documentary adds something written scholarship alone does not.</li>
+    </ul>
+    <h4>III. Study design, methods and procedures</h4>
+    <ul>
+      <li>Both methods side by side: archival (working through the register with Murphy) and documentary (pre-production, filming, interviews).</li>
+      <li>If interviewing living people, describe exactly what you will ask them to do. This section is adapted from the IRB exempt-research application, so <span class="thesis-flag">settle the IRB question with your director BEFORE submitting</span>, not after.</li>
+      <li>Attach planned interview questions/instruments, even in draft.</li>
+    </ul>
+    <h4>IV. References / resources</h4>
+    <p>The specific archive or collection (UK National Archives CO 258, or wherever Murphy's project draws from), secondary scholarship read, relevant organizations, and people (Murphy, your director, St. Lucia contacts).</p>
+    <h4>V. Timeline</h4>
+    <p>A real schedule with dates — essentially a condensed version of the milestone cards above. Explicitly account for the Newhouse LA semester, as Honors asks ("be sure to take into account time spent for study abroad"). Showing Crown up front that you planned around it works in your favour rather than surprising them later.</p>
+    <h4>The "Capstone Plus" requirement — do not skip</h4>
+    <ul>
+      <li>Your Newhouse advisor must <b>explicitly consent</b> to the capstone work being used as your Honors thesis. Get it in writing (email is fine) before or alongside the proposal.</li>
+      <li>The thesis <b>cannot be a 1:1 copy</b> of the capstone requirement. Since documentary capstones are often team-based, name <b>specifically what part is your individual contribution</b> — e.g. you direct and are sole author of the written thesis; the crew shot X but you edited, structured and wrote the analysis. State it explicitly so it is not questioned later.</li>
+      <li>Confirm whether your department's internal capstone-proposal deadline differs from Crown's April 15, and plan around whichever is earlier.</li>
+    </ul>`},
+
+  {id:"ref-sources", title:"Sources", html:`
+    <ul>
+      <li><a href="https://honors.syr.edu/advising/curriculum-requirements/" target="_blank">Crown Honors — Curriculum &amp; Requirements</a></li>
+      <li><a href="https://honors.syr.edu/thesis/planning-thesis/submit-thesis-proposal" target="_blank">Crown Honors — Submit Your Thesis Proposal</a> (April 15 deadline)</li>
+      <li><a href="https://honors.syr.edu/thesis/planning-thesis/" target="_blank">Crown Honors — Planning Your Thesis</a></li>
+      <li><a href="https://honors.syr.edu/thesis/planning-thesis/faculty-mentored-thesis-info/" target="_blank">Crown Honors — FMTP proposal info</a> (the 5-section structure)</li>
+      <li><a href="https://honors.syr.edu/thesis/2026/03/16/building-thesis-out-of-a-program-required-project-capstone-directed-research-etc/" target="_blank">Crown Honors — "Capstone Plus" pathway</a></li>
+      <li><a href="https://honors.syr.edu/thesis/producing-thesis/fund-thesis/" target="_blank">Crown Honors — Fund Your Thesis</a> (March 1 / April 15)</li>
+      <li><a href="https://coursecatalog.syracuse.edu/undergraduate/courses/trf/" target="_blank">SU Catalog — TRF courses</a> (TRF 499 Honors Capstone Project)</li>
+      <li><a href="https://newhouse.syracuse.edu/students/special-opportunities/newhouse-la/" target="_blank">Newhouse LA</a> · <a href="https://newhouse.syracuse.edu/students/special-opportunities/visiting-students/" target="_blank">off-campus program deadlines</a></li>
+      <li><a href="https://surface.syr.edu/trf_hcapstone/" target="_blank">TRF Honors Thesis archive</a> · <a href="https://surface.syr.edu/mag_hcapstone/" target="_blank">Magazine/News archive</a> · <a href="https://surface.syr.edu/honors_capstones/" target="_blank">Honors Capstones overview</a></li>
+      <li><a href="https://beta.nationalarchives.gov.uk/catalogue/id/C2257166" target="_blank">UK National Archives — CO 258 St. Lucia Miscellanea</a> · <a href="https://en.wikipedia.org/wiki/Protector_of_Slaves" target="_blank">Protector of Slaves background</a></li>
+    </ul>
+    <p style="color:var(--ink-dim);font-size:12px;">Crown proposal timing, funding cycles and department capstone dates can shift year to year. Confirm current dates with your Honors advisor and department coordinator before locking your calendar.</p>`},
 ];
 
 /* ======================================================================
@@ -1388,9 +1665,10 @@ const MESSAGE_ALERTS = [
    A daily scheduled task ("daily-blackboard-sync") re-checks both sources
    and updates this block + LAST_BLACKBOARD_CHECK every run — it never
    invents a date that isn't actually posted on Blackboard.
-   Coverage note: as of the last check, TRF 444 and TRF 340 have no due dates
-   posted yet — that's not a miss, those professors simply haven't added any.
-   They'll appear here once posted.
+   Coverage note: as of the last check, TRF 340 has no due dates posted yet —
+   that's not a miss, the course is still listed "Closed" by its instructor on
+   Blackboard. TRF 444 has begun posting scheduling exercises. Items will
+   appear here once posted.
    estimatedMinutes: how long each item will likely take, rounded to the
    nearest 15 min. Blackboard/InQuizitive/Pearson MyLab don't expose an
    authoritative "time to complete" figure, so these are reasoned estimates
@@ -1398,7 +1676,7 @@ const MESSAGE_ALERTS = [
    chapter, homework problem set, multi-part project) — not a scraped stat.
    The daily sync task assigns one to every new item it adds (see its
    SKILL.md), so this should stay populated going forward.
-   Last checked: 2026-09-20.
+   Last checked: 2026-09-24.
    source:"acc-schedule" marks entries taken from ACC 201's authoritative
    "Course Schedule updated 9/8/2026" document on Blackboard rather than from
    the Calendar feed — the professor has published these dates but hasn't
@@ -1409,7 +1687,7 @@ const MESSAGE_ALERTS = [
    Blackboard already uses; the Managerial ones ("Chapter M:N") are a
    reasoned guess at the same pattern and may need retitling on first sync.
    ====================================================================== */
-const LAST_BLACKBOARD_CHECK = "2026-09-20";
+const LAST_BLACKBOARD_CHECK = "2026-09-24";
 
 const BLACKBOARD_ASSIGNMENTS = [
   {id:"bb-hnr350-1", courseId:"hnr350", title:"Homework, week of Aug 23 — Reading: Visual Culture (Boylan); Writing: Personal Reflective (PR)", date:"2026-08-26", estimatedMinutes:60},
@@ -1436,11 +1714,16 @@ const BLACKBOARD_ASSIGNMENTS = [
   {id:"bb-phi311-6", courseId:"phi311", title:"Reading assignment on Descartes' dualism", date:"2026-09-22", estimatedMinutes:30},
   {id:"bb-hnr350-8", courseId:"hnr350", title:"Homework, week of Sept 20 — Reading: Chapter 4 “Learning to Think Visually”, Experiences in Visual Thinking (McKim), pp. 28–31 (look up the author; note it predates the research on aphantasia); Exercise 4-1 in notebook", date:"2026-09-23", estimatedMinutes:45},
   {id:"bb-hnr350-9", courseId:"hnr350", title:"Homework, week of Sept 20 — Video: “Do Schools Kill Creativity?” (Sir Ken Robinson, TED); Writing: PR", date:"2026-09-23", estimatedMinutes:45},
+  {id:"bb-trf444-2", courseId:"trf444", title:"Starved Scheduling Exercise #2", date:"2026-09-24", estimatedMinutes:75},
   {id:"bb-eee370-5", courseId:"eee370", title:"InQuizitive: Chapter 5 — Choosing Your Customer", date:"2026-09-28", estimatedMinutes:30},
   {id:"bb-acc201-3", courseId:"acc201", title:"Chapter F:3 Homework", date:"2026-10-01", estimatedMinutes:45},
+  {id:"bb-eee370-8", courseId:"eee370", title:"InQuizitive: Chapter 6: Choosing Your Technology", date:"2026-10-05", estimatedMinutes:30},
   {id:"bb-acc201-4", courseId:"acc201", title:"Chapter F:4 Homework", date:"2026-10-06", estimatedMinutes:45},
+  {id:"bb-eee370-9", courseId:"eee370", title:"InQuizitive: Chapter 7: Choosing Your Organization", date:"2026-10-12", estimatedMinutes:30},
+  {id:"bb-eee370-10", courseId:"eee370", title:"InQuizitive: Chapter 8: Choosing Your Competition", date:"2026-10-19", estimatedMinutes:30},
   {id:"bb-acc201-5", courseId:"acc201", title:"Chapter F:5 Homework", date:"2026-10-22", estimatedMinutes:45},
   {id:"bb-eee370-6", courseId:"eee370", title:"Entrepreneur Interview", date:"2026-10-26", estimatedMinutes:120},
+  {id:"bb-eee370-11", courseId:"eee370", title:"InQuizitive: Chapter 9. Intellectual Property Strategy", date:"2026-10-26", estimatedMinutes:30},
   {id:"bb-acc201-7", courseId:"acc201", title:"Chapter F:6 Homework", date:"2026-10-29", estimatedMinutes:45, source:"acc-schedule"},
   {id:"bb-acc201-8", courseId:"acc201", title:"Chapter F:10 Homework", date:"2026-11-03", estimatedMinutes:45, source:"acc-schedule"},
   {id:"bb-acc201-9", courseId:"acc201", title:"EYARC Assignment", date:"2026-11-12", estimatedMinutes:120, source:"acc-schedule"},
@@ -1796,6 +2079,9 @@ function rerenderAll(){
   renderDailyConnection();
   renderMessageAlerts();
   renderThesis();
+  renderThesisStrategy();
+  renderThesisRequirements();
+  renderThesisReference();
 }
 
 document.getElementById("syncToggleBtn").addEventListener("click", ()=>{
@@ -1832,16 +2118,32 @@ document.getElementById("syncClearBtn").addEventListener("click", ()=>{
   renderSyncStatus();
 });
 
+/* ======================================================================
+   Every date in this file is stored as a bare "YYYY-MM-DD" string. Passing
+   one straight to new Date() parses it as UTC midnight, and rendering that
+   in Eastern time (UTC-4/-5) rolls it back to the previous evening — so
+   EVERY date displayed an entire day early. ACC Exam 1, stored correctly as
+   2026-09-17, rendered as "Sep 16, 2026"; the Fall 2026 drop deadline read
+   Sep 13 instead of Sep 14. Parse the parts explicitly so the Date lands on
+   local midnight of the intended day instead.
+   ====================================================================== */
+function parseLocalDate(value){
+  if(value instanceof Date) return new Date(value);
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value));
+  if(m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return new Date(value); // full timestamps keep their own offset handling
+}
+
 function daysUntil(dateStr){
   if(!dateStr) return null;
   const today = new Date(); today.setHours(0,0,0,0);
-  const target = new Date(dateStr);
+  const target = parseLocalDate(dateStr);
   return Math.round((target - today) / 86400000);
 }
 
 function fmtDate(dateStr){
   if(!dateStr) return "Rolling";
-  const d = new Date(dateStr);
+  const d = parseLocalDate(dateStr);
   return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
 }
 
@@ -2165,7 +2467,7 @@ async function renderDeadlines(){
 
   const all = [...SCHOOL_DEADLINES, ...custom]
     .filter(d => { const days = daysUntil(d.date); return days === null || days >= -1; })
-    .sort((a,b) => new Date(a.date) - new Date(b.date));
+    .sort((a,b) => parseLocalDate(a.date) - parseLocalDate(b.date));
 
   const wrap = document.getElementById("deadlinesGrid");
   wrap.innerHTML = all.length ? all.map(d => `
@@ -2455,11 +2757,25 @@ function isExamOrQuiz(a){
   if(a.type === "exam") return true;
   return /\bexam\b|\bquiz\b|\bmidterm\b/i.test(a.title);
 }
+/* How long a checked-off assignment stays visible (struck through) before it
+   clears from the Study Center list. It was "the rest of the day it was
+   checked", which made a Monday tick vanish on Tuesday and read as lost work.
+   A week means you can still see what you finished. */
+const COMPLETED_VISIBLE_DAYS = 7;
+
+// Local ISO date n days before today, used for the completed-item cutoff.
+function isoDaysAgo(n){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() - n);
+  return isoDate(d);
+}
+
 function isoDate(d){
   return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
 function sundayOf(date){
-  const d = new Date(date);
+  const d = parseLocalDate(date);
   const day = d.getDay(); // 0=Sun..6=Sat
   d.setDate(d.getDate() - day);
   d.setHours(0,0,0,0);
@@ -2582,7 +2898,7 @@ async function computeStudyPlan(weekDates, windowStart, windowEnd, studyStates){
       placed.push({...s, date:ov.date, start:ov.start, minutes:ov.minutes, pinned:true, done});
       continue;
     }
-    const target = new Date(s.dueDate + "T00:00:00");
+    const target = parseLocalDate(s.dueDate);
     target.setDate(target.getDate() - s.index);
     const targetIso = isoDate(target);
     if(!weekIsoSet.has(targetIso)) continue; // this session's natural day isn't in the visible week
@@ -2901,6 +3217,84 @@ async function renderSchedule(){
   }
 }
 
+/* ---- Thesis: strategy header, requirements checklist, reference panels ---- */
+function renderThesisStrategy(){
+  const el = document.getElementById("thesisStrategy");
+  if(!el) return;
+  el.innerHTML = `
+    <div class="docs-title">The strategic move — these are not two projects</div>
+    <div style="font-size:13px;line-height:1.6;">
+      <p style="margin:0 0 10px;">Newhouse already has a mechanism for exactly this. Every Newhouse department offers an
+      <b>Honors Capstone Project</b> course (TRF 499 is the TRF version) that exists so an Honors thesis
+      <i>counts as</i> your major capstone. You do not do two final projects — you do one documentary that
+      satisfies both offices.</p>
+      <p style="margin:0 0 6px;">So the real job is:</p>
+      <ol style="margin:0;padding-left:20px;">
+        <li><b>Two approvals on one project</b> — your major department (capstone) and Crown Honors (thesis) —
+        rather than negotiating two different projects.</li>
+        <li><b>Two people who together cover both halves</b> — a Newhouse faculty member as thesis
+        director/capstone advisor (the person you enroll under; the primary supervisor must be Newhouse
+        faculty), and <b>Dr. Murphy as second reader</b> for historical and archival rigour. That pairing is
+        what satisfies Crown's graded <b>interdisciplinarity</b> requirement — lean into it in the proposal
+        rather than treating it as a logistical inconvenience.</li>
+        <li><b>Credits structured so the same footage and research</b> become both the written Crown thesis and
+        the capstone deliverable, instead of two separate write-ups.</li>
+      </ol>
+      <div class="growth-hold-note">Assumptions still unconfirmed — they change course numbers and dates:
+      junior standing now (graduating spring 2028); <b>TRF</b> as the major (if Broadcast &amp; Digital
+      Journalism, Magazine, or Visual Comm, the strategy holds but the capstone course and coordinator differ);
+      and "POS" read as the <b>Protector of Slaves</b> registers, St. Lucia 1824–1834.</div>
+    </div>`;
+}
+
+async function renderThesisRequirements(){
+  const el = document.getElementById("thesisRequirements");
+  if(!el) return;
+  let html = `<div class="docs-title">Graduation requirements checklist</div>`;
+  for(const group of THESIS_REQUIREMENTS){
+    html += `<div class="req-group-title">${group.group}</div>`;
+    for(const item of group.items){
+      const st = await getJSON("thesisreq-" + item.id, {done:false});
+      html += `
+        <div class="task-row${st.done ? " done" : ""}">
+          <input type="checkbox" class="thesis-req-check" data-id="${item.id}" ${st.done ? "checked" : ""}>
+          <div class="task-text"><b>${item.label}</b>
+            <span style="display:block;color:var(--ink-dim);font-size:12px;margin-top:3px;">${item.note}</span>
+          </div>
+        </div>`;
+    }
+  }
+  const total = THESIS_REQUIREMENTS.reduce((n,g) => n + g.items.length, 0);
+  let doneCount = 0;
+  for(const g of THESIS_REQUIREMENTS){
+    for(const i of g.items){
+      const st = await getJSON("thesisreq-" + i.id, {done:false});
+      if(st.done) doneCount++;
+    }
+  }
+  html += `<div class="growth-hold-note">${doneCount} of ${total} confirmed complete. Ticks are yours and sync across devices — they are not read from any official audit, so verify against your Honors audit.</div>`;
+  el.innerHTML = html;
+  el.querySelectorAll(".thesis-req-check").forEach(cb => {
+    cb.addEventListener("change", async (e)=>{
+      await setJSON("thesisreq-" + e.target.dataset.id, {done: e.target.checked});
+      renderThesisRequirements();
+    });
+  });
+}
+
+function renderThesisReference(){
+  const el = document.getElementById("thesisReference");
+  if(!el) return;
+  // Keep whichever panels are already expanded so a background sync
+  // re-render doesn't collapse something being read.
+  const openIds = new Set([...el.querySelectorAll("details[open]")].map(d => d.id));
+  el.innerHTML = THESIS_REFERENCE.map(r => `
+    <details class="thesis-ref" id="${r.id}"${(openIds.size ? openIds.has(r.id) : r.open) ? " open" : ""}>
+      <summary>${r.title}</summary>
+      <div class="thesis-ref-body">${r.html}</div>
+    </details>`).join("");
+}
+
 /* ---- Study Center ---- */
 async function renderStudy(){
   const wrap = document.getElementById("studyGrid");
@@ -2909,6 +3303,10 @@ async function renderStudy(){
     const state = await getJSON("study-" + course.id, {canvas:"", prof:"", officeHours:"", notes:"", assignments:[], allowedAbsences:null, absenceChecks:[]});
     if(!state.assignments) state.assignments = [];
     if(!state.absenceChecks) state.absenceChecks = [];
+    // Ids of auto-seeded assignments the user has dismissed with the "×"
+    // button. Without this, the seeding loop below re-added them on the very
+    // next render (not just on reload), so "×" appeared to do nothing.
+    if(!state.dismissed) state.dismissed = [];
     if(state.allowedAbsences === undefined) state.allowedAbsences = null;
 
     // Sync in Blackboard-sourced HOMEWORK due dates (read-only source of
@@ -2918,7 +3316,13 @@ async function renderStudy(){
     // Deadlines card (too routine/frequent for that page — see below).
     let changed = false;
     for(const src of BLACKBOARD_ASSIGNMENTS.filter(a => a.courseId === course.id)){
-      const existing = state.assignments.find(a => a.title === src.title && a.date === src.date);
+      // Dismissed with "×" — must stay gone across renders, reloads and devices.
+      if(state.dismissed.includes(src.id)) continue;
+      // Match on id FIRST so an upstream retitle (e.g. when the daily sync
+      // renames an acc-schedule row to Blackboard's exact wording) updates the
+      // row in place, carrying its done state, instead of adding a duplicate.
+      const existing = state.assignments.find(a => a.id === src.id)
+                    || state.assignments.find(a => a.title === src.title && a.date === src.date);
       if(existing){
         // Backfill estimatedMinutes onto an item added before this feature
         // existed, without touching its done/doneDate state.
@@ -2926,6 +3330,8 @@ async function renderStudy(){
           existing.estimatedMinutes = src.estimatedMinutes;
           changed = true;
         }
+        if(existing.title !== src.title){ existing.title = src.title; changed = true; }
+        if(existing.date !== src.date){ existing.date = src.date; changed = true; }
         continue;
       }
       state.assignments.push({id: src.id, title: src.title, date: src.date, done:false, fromBlackboard:true, estimatedMinutes: src.estimatedMinutes});
@@ -3040,15 +3446,15 @@ async function renderStudy(){
     });
 
     const listWrap = card.querySelector(".study-assignment-list");
-    // A checked-off assignment stays visible (struck through) for the rest of the
-    // day it was checked, then clears from the list starting the next calendar
-    // day. Legacy items marked done before this feature existed (no doneDate
-    // recorded) clear immediately, since we can't know when they were checked.
+    // A checked-off assignment stays visible (struck through) for
+    // COMPLETED_VISIBLE_DAYS days after the day it was checked, then clears
+    // from the list. Legacy items marked done before doneDate was recorded
+    // clear immediately, since we can't know when they were checked.
     function renderAssignments(){
-      const today = todayIso();
+      const cutoff = isoDaysAgo(COMPLETED_VISIBLE_DAYS);
       const visible = state.assignments.filter(a => {
         if(!a.done) return true;
-        return (a.doneDate || "2000-01-01") >= today;
+        return (a.doneDate || "2000-01-01") >= cutoff;
       });
       listWrap.innerHTML = visible.length ? visible
         .slice()
@@ -3060,6 +3466,11 @@ async function renderStudy(){
           <button class="remove-btn" data-aid="${a.id}">×</button>
         </div>
       `).join("") : `<div class="empty-state">No assignments added yet.</div>`;
+      if(state.dismissed.length){
+        listWrap.innerHTML += `<div class="empty-state" style="display:flex;align-items:center;gap:8px;">`
+          + `${state.dismissed.length} auto item${state.dismissed.length === 1 ? "" : "s"} hidden`
+          + `<button class="remove-btn restore-dismissed-btn" style="width:auto;padding:0 8px;">Restore</button></div>`;
+      }
     }
     renderAssignments();
 
@@ -3077,9 +3488,23 @@ async function renderStudy(){
     });
     listWrap.addEventListener("click", async (e)=>{
       if(e.target.classList.contains("remove-btn")){
-        state.assignments = state.assignments.filter(x => x.id !== e.target.dataset.aid);
+        const aid = e.target.dataset.aid;
+        const item = state.assignments.find(x => x.id === aid);
+        // Auto-seeded rows come from the data blocks, so deleting alone isn't
+        // enough — record the id so the seeding loop stops re-adding it.
+        if(item && (item.fromBlackboard || item.fromSyllabus)){
+          if(!state.dismissed.includes(aid)) state.dismissed.push(aid);
+        }
+        state.assignments = state.assignments.filter(x => x.id !== aid);
         await setJSON("study-" + course.id, state);
         renderAssignments();
+        renderSchedule();
+      }
+      if(e.target.classList.contains("restore-dismissed-btn")){
+        state.dismissed = [];
+        await setJSON("study-" + course.id, state);
+        await renderStudy();   // re-seeds the rows that were hidden
+        renderSchedule();
       }
     });
     card.querySelector(".add-assignment-btn").addEventListener("click", async ()=>{
@@ -3108,6 +3533,9 @@ renderContacts();
 renderDailyConnection();
 renderMessageAlerts();
 renderThesis();
+renderThesisStrategy();
+renderThesisRequirements();
+renderThesisReference();
 
 // Cross-device sync boot: render local state instantly above (so the page
 // never flashes empty), then pull the cloud copy in the background and
