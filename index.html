@@ -1667,6 +1667,15 @@ const MESSAGE_ALERTS = [
    A daily scheduled task ("daily-blackboard-sync") re-checks both sources
    and updates this block + LAST_BLACKBOARD_CHECK every run — it never
    invents a date that isn't actually posted on Blackboard.
+   PHI 311 (Prof. Richardson) is a THIRD source and an easy one to miss: she
+   posts no announcements at all, and attaches NO due date to her Blackboard
+   assessments, so her work never appears in the Calendar's due-dates view.
+   The real dates live only in the "Syllabus and Schedule of Topics" document
+   on the course Content page, as "Week N — Tuesday: Reading assignment /
+   Thursday: worksheet". Week 1 Thursday = 2026-08-27 and each week runs
+   Tue/Thu from there, which is how bb-phi311-7 was dated. Check that document
+   and the course Gradebook (which lists every item, with due dates where they
+   exist) rather than trusting the calendar feed for this course.
    Coverage note: as of the last check, TRF 340 has no due dates posted yet —
    that's not a miss, the course is still listed "Closed" by its instructor on
    Blackboard. TRF 444 has begun posting scheduling exercises. Items will
@@ -1678,7 +1687,7 @@ const MESSAGE_ALERTS = [
    chapter, homework problem set, multi-part project) — not a scraped stat.
    The daily sync task assigns one to every new item it adds (see its
    SKILL.md), so this should stay populated going forward.
-   Last checked: 2026-09-27.
+   Last checked: 2026-09-28.
    source:"acc-schedule" marks entries taken from ACC 201's authoritative
    "Course Schedule updated 9/8/2026" document on Blackboard rather than from
    the Calendar feed — the professor has published these dates but hasn't
@@ -1689,7 +1698,7 @@ const MESSAGE_ALERTS = [
    Blackboard already uses; the Managerial ones ("Chapter M:N") are a
    reasoned guess at the same pattern and may need retitling on first sync.
    ====================================================================== */
-const LAST_BLACKBOARD_CHECK = "2026-09-27";
+const LAST_BLACKBOARD_CHECK = "2026-09-28";
 
 const BLACKBOARD_ASSIGNMENTS = [
   {id:"bb-hnr350-1", courseId:"hnr350", title:"Homework, week of Aug 23 — Reading: Visual Culture (Boylan); Writing: Personal Reflective (PR)", date:"2026-08-26", estimatedMinutes:60},
@@ -1719,6 +1728,7 @@ const BLACKBOARD_ASSIGNMENTS = [
   {id:"bb-trf444-2", courseId:"trf444", title:"Starved Scheduling Exercise #2", date:"2026-09-24", estimatedMinutes:75},
   {id:"bb-eee370-5", courseId:"eee370", title:"InQuizitive: Chapter 5 — Choosing Your Customer", date:"2026-09-28", estimatedMinutes:30},
   {id:"bb-hnr350-10", courseId:"hnr350", title:"Homework, week of Sept 27 — Reading: “Visual and Statistical Thinking: Displays of Evidence for Making Decisions” (Tufte), pp. 4–15, first half (only the first two quotes on p. 4); annotate w/ marginalia on paper and bring the hard copy to class; Writing: Analytical, Critical, and Reflective Analysis (ACRA) — four paragraphs per Dr. Povinelli’s ACRA protocols (not a PR)", date:"2026-09-28", estimatedMinutes:120},
+  {id:"bb-phi311-7", courseId:"phi311", title:"Reading assignment on the Sixth Meditation and the Mind-Body Problem", date:"2026-09-29", estimatedMinutes:30},
   {id:"bb-hnr350-11", courseId:"hnr350", title:"Homework, week of Sept 27 — Reading: EVT Chapter 2 “Images in Action”; Exercises: all Chapter 2 exercises on the handout, bring to class", date:"2026-09-30", estimatedMinutes:75},
   {id:"bb-acc201-3", courseId:"acc201", title:"Chapter F:3 Homework", date:"2026-10-01", estimatedMinutes:45},
   {id:"bb-eee370-8", courseId:"eee370", title:"InQuizitive: Chapter 6: Choosing Your Technology", date:"2026-10-05", estimatedMinutes:30},
@@ -2766,10 +2776,20 @@ function isExamOrQuiz(a){
   return /\bexam\b|\bquiz\b|\bmidterm\b/i.test(a.title);
 }
 /* How long a checked-off assignment stays visible (struck through) before it
-   clears from the Study Center list. It was "the rest of the day it was
-   checked", which made a Monday tick vanish on Tuesday and read as lost work.
-   A week means you can still see what you finished. */
-const COMPLETED_VISIBLE_DAYS = 7;
+   clears from the Study Center list. One day: a box you tick today is still
+   there tomorrow, and gone the day after. (This was briefly a week, so you
+   could look back at what you'd finished; Ima asked for the shorter window
+   to keep the list tight.) */
+const COMPLETED_VISIBLE_DAYS = 1;
+
+/* An assignment clears from the Study Center list once its due date is this
+   many days in the past — whether or not it was ever checked off — so old
+   work stops piling up at the top of each course card.
+   NOTE: both cutoffs only change what the list DISPLAYS. The item stays in
+   saved state, so calendar due-date badges keep their DONE flags, the daily
+   Blackboard sync still sees it for duplicate-matching, and nothing is
+   destroyed. Raise either number to bring old rows back into view. */
+const STALE_AFTER_DAYS = 7;
 
 // Local ISO date n days before today, used for the completed-item cutoff.
 function isoDaysAgo(n){
@@ -3454,15 +3474,23 @@ async function renderStudy(){
     });
 
     const listWrap = card.querySelector(".study-assignment-list");
-    // A checked-off assignment stays visible (struck through) for
-    // COMPLETED_VISIBLE_DAYS days after the day it was checked, then clears
-    // from the list. Legacy items marked done before doneDate was recorded
-    // clear immediately, since we can't know when they were checked.
+    // Two automatic cutoffs keep this list showing only current work:
+    //   1. anything whose due date is STALE_AFTER_DAYS or more in the past
+    //      clears out, checked or not;
+    //   2. a checked-off item clears COMPLETED_VISIBLE_DAYS after the day it
+    //      was ticked.
+    // Undated items (added by hand with no date) are never auto-cleared —
+    // there's no due date to measure them against. Legacy items marked done
+    // before doneDate was recorded clear immediately, since we can't know
+    // when they were checked. Both cutoffs are display-only; see the
+    // constants above.
     function renderAssignments(){
-      const cutoff = isoDaysAgo(COMPLETED_VISIBLE_DAYS);
+      const doneCutoff  = isoDaysAgo(COMPLETED_VISIBLE_DAYS);
+      const staleCutoff = isoDaysAgo(STALE_AFTER_DAYS);
       const visible = state.assignments.filter(a => {
+        if(a.date && a.date <= staleCutoff) return false;
         if(!a.done) return true;
-        return (a.doneDate || "2000-01-01") >= cutoff;
+        return (a.doneDate || "2000-01-01") >= doneCutoff;
       });
       listWrap.innerHTML = visible.length ? visible
         .slice()
