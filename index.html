@@ -1852,7 +1852,10 @@ if(!window.storage){
     },
     async set(key, value){
       localStorage.setItem(key, value);
-      ghScheduleSync(key); // mirror this write to the cloud (no-op if sync isn't connected on this device)
+      // Mirror this write to the cloud (no-op if sync isn't connected on this
+      // device) — unless it's an automatic re-seed (see setJSONQuiet), which
+      // every device recomputes itself and must never be pushed as an edit.
+      if(!ghSuppressSync) ghScheduleSync(key);
     }
   };
 }
@@ -1913,6 +1916,34 @@ const GH_SHA_KEY = "github-sync-sha-cache";    // last-known remote file SHA, fo
 let ghSyncTimer = null;
 let ghSyncDirtyKeys = new Set();   // keys written locally since the last successful push
 let ghSyncInFlight = false;
+let ghSuppressSync = false;          // true only while setJSONQuiet() is writing
+let ghFirstPullDone = false;         // set once this page load has merged the cloud copy
+
+/* Absence checks live in their own "absences-<courseId>" key as
+   {slots:[{checked, at}]}, where `at` is when that box last changed. They
+   used to sit inside the study-<courseId> blob, so any device that re-saved
+   that blob from stale local data (e.g. when a new Blackboard row was seeded
+   on page load, before the first pull) pushed the old unchecked boxes over
+   the cloud copy. Now each slot merges independently: the newer change wins,
+   and a tie keeps it checked — a recorded absence is never silently lost. */
+const ABSENCE_KEY_PREFIX = "internship-tracker:absences-";
+function mergeAbsenceValues(aStr, bStr){
+  let a, b;
+  try{ a = aStr ? JSON.parse(aStr) : null; }catch(e){ a = null; }
+  try{ b = bStr ? JSON.parse(bStr) : null; }catch(e){ b = null; }
+  if(!a || !Array.isArray(a.slots)) return b ? JSON.stringify(b) : (aStr || bStr);
+  if(!b || !Array.isArray(b.slots)) return JSON.stringify(a);
+  const n = Math.max(a.slots.length, b.slots.length);
+  const slots = [];
+  for(let i = 0; i < n; i++){
+    const x = a.slots[i] || {checked:false, at:0};
+    const y = b.slots[i] || {checked:false, at:0};
+    if((x.at || 0) > (y.at || 0)) slots.push(x);
+    else if((y.at || 0) > (x.at || 0)) slots.push(y);
+    else slots.push({checked: !!(x.checked || y.checked), at: x.at || 0});
+  }
+  return JSON.stringify({slots});
+}
 let ghSyncSha = localStorage.getItem(GH_SHA_KEY) || null;
 let ghSyncStatus = "idle";         // idle | syncing | error
 
@@ -2009,12 +2040,21 @@ async function ghSyncPull(){
     if(sha) localStorage.setItem(GH_SHA_KEY, sha);
     let changed = false;
     for(const key of Object.keys(data)){
+      if(key.startsWith(ABSENCE_KEY_PREFIX)){
+        // Merged slot-by-slot even when dirty, so neither side's checks are lost.
+        const local = localStorage.getItem(key);
+        const merged = mergeAbsenceValues(local, data[key]);
+        if(merged !== local){ localStorage.setItem(key, merged); changed = true; }
+        if(merged !== data[key]) ghScheduleSync(key); // push our newer checks back up
+        continue;
+      }
       if(ghSyncDirtyKeys.has(key)) continue;
       if(localStorage.getItem(key) !== data[key]){
         localStorage.setItem(key, data[key]);
         changed = true;
       }
     }
+    ghFirstPullDone = true;
     ghSyncStatus = "idle";
     return {ok:true, changed};
   }catch(e){
@@ -2445,6 +2485,22 @@ async function setJSON(key, value){
     console.warn("Storage unavailable, using in-memory only for this session.", e);
   }
 }
+// For automatic, deterministic writes (seeding Blackboard/syllabus rows,
+// auto-filled contact info, cleanups) made BEFORE this page load's first
+// successful cloud pull. Saved locally but NOT pushed: the page renders from
+// local data first, so on a device that hadn't synced yet these writes were
+// built on stale state, and pushing them overwrote real edits (checked boxes,
+// absences, notes) made on another device. The first pull then replaces
+// local with the cloud copy and re-renders, and that re-seed (now on fresh
+// data) saves normally via autoSaver().
+async function setJSONQuiet(key, value){
+  ghSuppressSync = true;
+  try{ await setJSON(key, value); }
+  finally{ ghSuppressSync = false; }
+}
+function autoSaver(){
+  return (ghFirstPullDone || !ghSyncEnabled()) ? setJSON : setJSONQuiet;
+}
 
 function countdownFor(dateStr, passedLabel){
   const days = daysUntil(dateStr);
@@ -2466,7 +2522,7 @@ async function addDeadlineFromSyllabus(course, title, date){
   const exists = custom.some(d => d.title === title && d.date === date);
   if(exists) return;
   custom.push({id:"custom-" + Date.now() + "-" + Math.random().toString(36).slice(2,6), title, date, category:"academic", courseColor: course.color, courseCode: course.code});
-  await setJSON("custom-deadlines", custom);
+  await autoSaver()("custom-deadlines", custom);
 }
 
 /* ---- School Deadlines ---- */
@@ -2478,7 +2534,7 @@ async function renderDeadlines(){
   // BLACKBOARD_ASSIGNMENTS by title+date.
   const beforeCleanup = custom.length;
   custom = custom.filter(d => !BLACKBOARD_ASSIGNMENTS.some(a => a.title === d.title && a.date === d.date));
-  if(custom.length !== beforeCleanup) await setJSON("custom-deadlines", custom);
+  if(custom.length !== beforeCleanup) await autoSaver()("custom-deadlines", custom);
 
   const all = [...SCHOOL_DEADLINES, ...custom]
     .filter(d => { const days = daysUntil(d.date); return days === null || days >= -1; })
@@ -3328,6 +3384,10 @@ function renderThesisReference(){
 async function renderStudy(){
   const wrap = document.getElementById("studyGrid");
   wrap.innerHTML = "";
+  // Captured once: states below are read now, so if they were read before the
+  // first pull, their automatic re-saves must stay local even if the pull
+  // lands partway through this loop.
+  const autoSave = autoSaver();
   for(const course of COURSES){
     const state = await getJSON("study-" + course.id, {canvas:"", prof:"", officeHours:"", notes:"", assignments:[], allowedAbsences:null, absenceChecks:[]});
     if(!state.assignments) state.assignments = [];
@@ -3380,7 +3440,7 @@ async function renderStudy(){
     state.assignments = state.assignments.filter(a => !a.fromSyllabus);
     if(state.assignments.length !== beforeCleanup) changed = true;
 
-    if(changed) await setJSON("study-" + course.id, state);
+    if(changed) await autoSave("study-" + course.id, state);
 
     // Attendance policy is a fixed syllabus fact, not user-editable — set it
     // from SYLLABUS_INFO every render (absenceChecks tracking still persists).
@@ -3395,7 +3455,7 @@ async function renderStudy(){
     if(!state.canvas && contactInfo.canvas){ state.canvas = contactInfo.canvas; contactChanged = true; }
     if(!state.prof && contactInfo.prof){ state.prof = contactInfo.prof; contactChanged = true; }
     if(!state.officeHours && contactInfo.officeHours){ state.officeHours = contactInfo.officeHours; contactChanged = true; }
-    if(contactChanged) await setJSON("study-" + course.id, state);
+    if(contactChanged) await autoSave("study-" + course.id, state);
 
     const card = document.createElement("div");
     card.className = "card study-card";
@@ -3451,16 +3511,29 @@ async function renderStudy(){
       renderAbsenceTracker();
     }
 
+    // Absences are stored apart from the study-<id> blob (see
+    // mergeAbsenceValues) so nothing that re-saves assignments can touch them.
+    // One-time migration: carry over any boxes checked under the old format.
+    const absenceKey = "absences-" + course.id;
+    let absences = await getJSON(absenceKey, null);
+    if(!absences || !Array.isArray(absences.slots)){
+      absences = {slots: (state.absenceChecks || []).map(c => ({checked: !!c, at: c ? 1 : 0}))};
+      if(absences.slots.some(s => s.checked)) await setJSON(absenceKey, absences);
+    }
+
     function renderAbsenceTracker(){
-      const slots = state.allowedAbsences || DEFAULT_ABSENCE_SLOTS;
-      while(state.absenceChecks.length < slots) state.absenceChecks.push(false);
-      state.absenceChecks = state.absenceChecks.slice(0, slots);
-      const usedCount = state.absenceChecks.filter(Boolean).length;
-      trackerEl.className = "absence-tracker" + (usedCount >= slots ? " maxed" : "");
+      const limit = state.allowedAbsences || DEFAULT_ABSENCE_SLOTS;
+      // Never drop a checked box: if more are checked than the limit, show them all.
+      const lastChecked = absences.slots.map(s => s.checked).lastIndexOf(true);
+      const slots = Math.max(limit, lastChecked + 1);
+      while(absences.slots.length < slots) absences.slots.push({checked:false, at:0});
+      const shown = absences.slots.slice(0, slots);
+      const usedCount = shown.filter(s => s.checked).length;
+      trackerEl.className = "absence-tracker" + (usedCount >= limit ? " maxed" : "");
       trackerEl.innerHTML = `
-        <span class="label">Absences used (${usedCount}/${slots}${state.allowedAbsences ? "" : ", no explicit limit found"})</span>
+        <span class="label">Absences used (${usedCount}/${limit}${state.allowedAbsences ? "" : ", no explicit limit found"})</span>
         <div class="absence-checks">
-          ${state.absenceChecks.map((checked, i) => `<label class="absence-check-item"><input type="checkbox" class="absence-check" data-idx="${i}" ${checked ? "checked" : ""}> ${i + 1}</label>`).join("")}
+          ${shown.map((s, i) => `<label class="absence-check-item"><input type="checkbox" class="absence-check" data-idx="${i}" ${s.checked ? "checked" : ""}> ${i + 1}</label>`).join("")}
         </div>
       `;
     }
@@ -3469,8 +3542,13 @@ async function renderStudy(){
     trackerEl.addEventListener("change", async (e)=>{
       if(!e.target.classList.contains("absence-check")) return;
       const idx = parseInt(e.target.dataset.idx, 10);
-      state.absenceChecks[idx] = e.target.checked;
-      await setJSON("study-" + course.id, state);
+      // A recorded absence stays put unless deliberately removed.
+      if(!e.target.checked && !confirm(`Remove absence #${idx + 1} from ${course.code}? Recorded absences normally stay on permanently.`)){
+        e.target.checked = true;
+        return;
+      }
+      absences.slots[idx] = {checked: e.target.checked, at: Date.now()};
+      await setJSON(absenceKey, absences);
       renderAbsenceTracker();
     });
 
