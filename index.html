@@ -1004,6 +1004,27 @@
   }
   .schedule-event-block b{display:block;font-family:'Oswald',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:0.01em;}
   .schedule-event-block span{display:block;font-size:10px;opacity:0.85;}
+  .class-cancel-btn, .class-restore-btn{
+    position:absolute;
+    top:1px;right:2px;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    font-size:12px;
+    line-height:1;
+    padding:2px 3px;
+    opacity:0;
+    transition:opacity .12s;
+  }
+  .class-cancel-btn{color:#0E0E0C;}
+  .class-restore-btn{color:var(--ink-dim); opacity:.75;}
+  .schedule-block:hover .class-cancel-btn,
+  .schedule-block:focus-within .class-cancel-btn,
+  .schedule-block:hover .class-restore-btn{opacity:.9;}
+  .class-cancel-btn:focus-visible, .class-restore-btn:focus-visible{
+    opacity:1; outline:2px solid var(--yellow); outline-offset:1px;
+  }
+  @media (hover:none){ .class-cancel-btn, .class-restore-btn{opacity:.7;} }
   .remove-event-btn{
     position:absolute;
     top:1px;right:2px;
@@ -2827,17 +2848,67 @@ let scheduleWeekOffset = defaultWeekOffset(); // weeks relative to the current c
 let studyViewOn = false; // toggled by the "Study View" checkbox above the calendar
 let dragState = null; // {sessionId, minutes} for the study block currently being dragged
 
+/* ======================================================================
+   Classes you cancel yourself, stored under "class-cancellations" and
+   merged with the seeded CLASS_CANCELLATIONS above (which covers only
+   university breaks). Kept in a module-level array because isCancelled()
+   is called synchronously from render paths; reload it with
+   loadCancellations() whenever it changes.
+   ====================================================================== */
+let userCancellations = [];
+async function loadCancellations(){
+  userCancellations = await getJSON("class-cancellations", []);
+}
+function isUserCancelled(dateIso, courseId){
+  return userCancellations.some(c => c.date === dateIso && c.courseId === courseId);
+}
+async function cancelClass(dateIso, courseId, reason){
+  const list = await getJSON("class-cancellations", []);
+  if(!list.some(c => c.date === dateIso && c.courseId === courseId)){
+    list.push({date: dateIso, courseId, reason: reason || "Cancelled"});
+    await setJSON("class-cancellations", list);
+  }
+  await loadCancellations();
+}
+async function uncancelClass(dateIso, courseId){
+  const list = await getJSON("class-cancellations", []);
+  await setJSON("class-cancellations", list.filter(c => !(c.date === dateIso && c.courseId === courseId)));
+  await loadCancellations();
+}
+
 function isCancelled(dateIso, courseId){
-  return CLASS_CANCELLATIONS.some(c => c.date === dateIso && (c.courseId === null || c.courseId === courseId));
+  return CLASS_CANCELLATIONS.some(c => c.date === dateIso && (c.courseId === null || c.courseId === courseId))
+      || isUserCancelled(dateIso, courseId);
 }
 function cancellationReason(dateIso, courseId){
+  const mine = userCancellations.find(c => c.date === dateIso && c.courseId === courseId);
+  if(mine) return mine.reason;
   const specific = CLASS_CANCELLATIONS.find(c => c.date === dateIso && c.courseId === courseId);
   if(specific) return specific.reason;
   const general = CLASS_CANCELLATIONS.find(c => c.date === dateIso && c.courseId === null);
   return general ? general.reason : "No class";
 }
+
+/* ======================================================================
+   Assignments dismissed with "×" in the Study Center. Those ids live in
+   each course's own study-<id> state, which the calendar paths can't read
+   synchronously — so they're cached here and refreshed whenever a
+   dismissal changes. Without this, an "×"d assignment vanished from the
+   Study Center but kept appearing as a due badge on the weekly schedule.
+   ====================================================================== */
+let dismissedAssignmentIds = new Set();
+async function loadDismissedAssignments(){
+  const out = new Set();
+  for(const c of COURSES){
+    const st = await getJSON("study-" + c.id, null);
+    if(st && Array.isArray(st.dismissed)) st.dismissed.forEach(id => out.add(id));
+  }
+  dismissedAssignmentIds = out;
+}
+
 function assignmentsDueOn(dateIso){
-  return [...BLACKBOARD_ASSIGNMENTS, ...SYLLABUS_ASSIGNMENTS].filter(a => a.date === dateIso);
+  return [...BLACKBOARD_ASSIGNMENTS, ...SYLLABUS_ASSIGNMENTS]
+    .filter(a => a.date === dateIso && !dismissedAssignmentIds.has(a.id));
 }
 // Exams/quizzes/midterms are shown directly on the class time-block itself
 // (see renderSchedule()) rather than as a due-badge above the grid, since
@@ -3016,6 +3087,8 @@ async function computeStudyPlan(weekDates, windowStart, windowEnd, studyStates){
 }
 
 async function renderSchedule(){
+  await loadCancellations();
+  await loadDismissedAssignments();
   // Weeks always show all 7 days, Sun–Sat (weekends included in both the
   // normal and Study View — classes just won't have anything scheduled on
   // Sat/Sun), and the same 10am–10pm hour range in both views.
@@ -3157,10 +3230,14 @@ async function renderSchedule(){
       const height = (endMin - startMin) * PX_PER_MIN;
       const cancelled = isCancelled(dateIso, ev.courseId);
       if(cancelled){
+        // Only a cancellation you made yourself can be undone here; the
+        // seeded university breaks are not yours to put back.
+        const mine = isUserCancelled(dateIso, ev.courseId);
         html += `<div class="schedule-block cancelled" style="top:${top}px;height:${height}px;">
           <b>${course ? course.code : ev.courseId}</b>
           <span>No class</span>
           <span>${cancellationReason(dateIso, ev.courseId)}</span>
+          ${mine ? `<button class="class-restore-btn" data-date="${dateIso}" data-course="${ev.courseId}" title="Put this class back">↺</button>` : ""}
         </div>`;
       } else {
         const examsToday = assignmentsDueOn(dateIso).filter(a => a.courseId === ev.courseId && isExamOrQuiz(a));
@@ -3170,6 +3247,7 @@ async function renderSchedule(){
           <span>${ev.start}–${ev.end} ET</span>
           <span>${ev.room}</span>
           ${examFlags}
+          <button class="class-cancel-btn" data-date="${dateIso}" data-course="${ev.courseId}" title="Mark this class cancelled">×</button>
         </div>`;
       }
     });
@@ -3211,6 +3289,23 @@ async function renderSchedule(){
   if(resetBtn) resetBtn.addEventListener("click", ()=>{ scheduleWeekOffset = defaultWeekOffset(); renderSchedule(); });
 
   document.getElementById("studyViewToggle").addEventListener("change", (e)=>{ studyViewOn = e.target.checked; renderSchedule(); });
+
+  // Cancel / restore live on the class blocks, which render whether or not
+  // Study View is on — so these bind outside that branch.
+  wrap.querySelectorAll(".class-cancel-btn").forEach(btn => {
+    btn.addEventListener("click", async (e)=>{
+      e.stopPropagation();
+      await cancelClass(btn.dataset.date, btn.dataset.course, "Cancelled");
+      renderSchedule();   // also frees the slot for study planning
+    });
+  });
+  wrap.querySelectorAll(".class-restore-btn").forEach(btn => {
+    btn.addEventListener("click", async (e)=>{
+      e.stopPropagation();
+      await uncancelClass(btn.dataset.date, btn.dataset.course);
+      renderSchedule();
+    });
+  });
 
   if(studyViewOn){
     document.getElementById("addEventBtn").addEventListener("click", async ()=>{
@@ -3631,12 +3726,14 @@ async function renderStudy(){
         }
         state.assignments = state.assignments.filter(x => x.id !== aid);
         await setJSON("study-" + course.id, state);
+        await loadDismissedAssignments();   // drop it from the calendar too
         renderAssignments();
         renderSchedule();
       }
       if(e.target.classList.contains("restore-dismissed-btn")){
         state.dismissed = [];
         await setJSON("study-" + course.id, state);
+        await loadDismissedAssignments();   // and back onto the calendar
         await renderStudy();   // re-seeds the rows that were hidden
         renderSchedule();
       }
