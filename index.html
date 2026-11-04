@@ -1859,7 +1859,7 @@ const SYLLABUS_ASSIGNMENTS = [
   {id:"syl-hnr350-1", courseId:"hnr350", title:"Final Exam / Research Presentation (univ.-scheduled, 12:45–2:45 PM)", date:"2026-12-14"},
   {id:"syl-phi311-1", courseId:"phi311", title:"In-class Argument Analysis #1", date:"2026-09-17", type:"exam"},
   {id:"syl-phi311-2", courseId:"phi311", title:"In-class Argument Analysis #2", date:"2026-10-08", type:"exam"},
-  {id:"syl-phi311-3", courseId:"phi311", title:"In-class Argument Analysis #3", date:"2026-11-05", type:"exam"},
+  {id:"syl-phi311-3", courseId:"phi311", title:"In-class Argument Analysis #3", date:"2026-11-10", type:"exam"},
   {id:"syl-phi311-4", courseId:"phi311", title:"In-class Argument Analysis #4", date:"2026-12-03", type:"exam"},
   {id:"syl-trf444-1", courseId:"trf444", title:"Production Videos & Party (last regular class day)", date:"2026-12-02"},
   {id:"syl-trf444-2", courseId:"trf444", title:"Final EXAM / Feature Film Presentations due (40 pts)", date:"2026-12-09"},
@@ -2569,10 +2569,20 @@ function countdownFor(dateStr, passedLabel){
    up correctly there. Used when merging in both BLACKBOARD_ASSIGNMENTS and
    SYLLABUS_ASSIGNMENTS entries.
    ====================================================================== */
+// Matches on title + course, NOT title + date. Matching on the date meant that
+// moving an exam (PHI 311's Argument Analysis #3 slipped Thu Nov 5 -> Tue Nov 10)
+// left the old card stranded and added a second one for the new date.
 async function addDeadlineFromSyllabus(course, title, date){
   const custom = await getJSON("custom-deadlines", []);
-  const exists = custom.some(d => d.title === title && d.date === date);
-  if(exists) return;
+  const existing = custom.find(d => d.title === title &&
+    (d.courseCode === course.code || d.courseCode === undefined));
+  if(existing){
+    if(existing.date !== date){
+      existing.date = date;
+      await autoSaver()("custom-deadlines", custom);
+    }
+    return;
+  }
   custom.push({id:"custom-" + Date.now() + "-" + Math.random().toString(36).slice(2,6), title, date, category:"academic", courseColor: course.color, courseCode: course.code});
   await autoSaver()("custom-deadlines", custom);
 }
