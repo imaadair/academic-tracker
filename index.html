@@ -2927,17 +2927,36 @@ function cancellationReason(dateIso, courseId){
    Study Center but kept appearing as a due badge on the weekly schedule.
    ====================================================================== */
 let dismissedAssignmentIds = new Set();
-async function loadDismissedAssignments(){
-  const out = new Set();
+
+/* Assignments typed into a course card's "Add assignment/exam" box. They live
+   only in that course's study-<id> state, so the calendar never saw them —
+   anything added by hand showed in the Study Center but nowhere on the week.
+   Cached here alongside the dismissals, from the same single pass. */
+let userAssignments = [];
+
+async function loadStudyDerived(){
+  const dismissed = new Set();
+  const added = [];
   for(const c of COURSES){
     const st = await getJSON("study-" + c.id, null);
-    if(st && Array.isArray(st.dismissed)) st.dismissed.forEach(id => out.add(id));
+    if(!st) continue;
+    if(Array.isArray(st.dismissed)) st.dismissed.forEach(id => dismissed.add(id));
+    if(Array.isArray(st.assignments)){
+      st.assignments.forEach(a => {
+        // Hand-added rows carry neither flag; a row with no date can't be placed.
+        if(!a.fromBlackboard && !a.fromSyllabus && a.date){
+          added.push({id: a.id, courseId: c.id, title: a.title, date: a.date,
+                      estimatedMinutes: a.estimatedMinutes});
+        }
+      });
+    }
   }
-  dismissedAssignmentIds = out;
+  dismissedAssignmentIds = dismissed;
+  userAssignments = added;
 }
 
 function assignmentsDueOn(dateIso){
-  return [...BLACKBOARD_ASSIGNMENTS, ...SYLLABUS_ASSIGNMENTS]
+  return [...BLACKBOARD_ASSIGNMENTS, ...SYLLABUS_ASSIGNMENTS, ...userAssignments]
     .filter(a => a.date === dateIso && !dismissedAssignmentIds.has(a.id));
 }
 // Exams/quizzes/midterms are shown directly on the class time-block itself
@@ -3118,7 +3137,7 @@ async function computeStudyPlan(weekDates, windowStart, windowEnd, studyStates){
 
 async function renderSchedule(){
   await loadCancellations();
-  await loadDismissedAssignments();
+  await loadStudyDerived();
   // Weeks always show all 7 days, Sun–Sat (weekends included in both the
   // normal and Study View — classes just won't have anything scheduled on
   // Sat/Sun), and the same 10am–10pm hour range in both views.
@@ -3756,14 +3775,14 @@ async function renderStudy(){
         }
         state.assignments = state.assignments.filter(x => x.id !== aid);
         await setJSON("study-" + course.id, state);
-        await loadDismissedAssignments();   // drop it from the calendar too
+        await loadStudyDerived();   // drop it from the calendar too
         renderAssignments();
         renderSchedule();
       }
       if(e.target.classList.contains("restore-dismissed-btn")){
         state.dismissed = [];
         await setJSON("study-" + course.id, state);
-        await loadDismissedAssignments();   // and back onto the calendar
+        await loadStudyDerived();   // and back onto the calendar
         await renderStudy();   // re-seeds the rows that were hidden
         renderSchedule();
       }
@@ -3774,6 +3793,8 @@ async function renderStudy(){
       if(!titleEl.value.trim()) return;
       state.assignments.push({id:"a-" + Date.now(), title:titleEl.value.trim(), date:dateEl.value || null, done:false});
       await setJSON("study-" + course.id, state);
+      await loadStudyDerived();   // so it appears on the calendar immediately
+      renderSchedule();
       titleEl.value = ""; dateEl.value = "";
       renderAssignments();
     });
