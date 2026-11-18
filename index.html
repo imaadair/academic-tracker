@@ -1502,6 +1502,7 @@
   }
   .daystrip-bar{ position:absolute; top:5px; bottom:5px; border-radius:2px; }
   .daystrip-bar.is-exam{ box-shadow:inset 0 0 0 1px var(--slate); }
+  .daystrip-bar.is-flagged{ box-shadow:0 0 0 1px var(--yellow); }
   .daystrip-bar.is-off{ opacity:0.3; }
   .daystrip-now{ position:absolute; top:0; bottom:0; width:1px; background:var(--yellow); }
   .daystrip-now::before{
@@ -1525,6 +1526,16 @@
   .daylist .d-time{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); white-space:nowrap; }
   .daylist .d-code{ font-family:'Oswald',sans-serif; font-size:12.5px; letter-spacing:0.06em; color:var(--ink); }
   .daylist .d-room{ font-size:11.5px; color:var(--ink-faint); overflow-wrap:anywhere; }
+  .daylist .d-flag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--yellow);
+    border:1px solid var(--yellow-dim);
+    border-radius:2px;
+    padding:1px 5px;
+  }
   .daylist li.is-off .d-code{ color:var(--ink-faint); text-decoration:line-through; }
   .daylist li.is-off .d-rail{ opacity:0.3; }
   .daystrip-none{ margin-top:14px; font-size:13.5px; color:var(--ink-faint); }
@@ -2510,6 +2521,9 @@ const SYLLABUS_ASSIGNMENTS = [
   {id:"syl-acc201-3", courseId:"acc201", title:"Exam 3", date:"2026-11-05"},
   {id:"syl-acc201-4", courseId:"acc201", title:"Exam 4 — university final exam slot, 10:15 AM–12:15 PM", date:"2026-12-15", type:"exam"},
   {id:"syl-acc201-5", courseId:"acc201", title:"EYARC Assignment due 11:59 PM", date:"2026-11-12", type:"deadline"},
+  // Told to Ima in class; not on the syllabus or on Blackboard, so it lives
+  // here rather than in BLACKBOARD_ASSIGNMENTS, which the daily sync rewrites.
+  {id:"syl-acc201-6", courseId:"acc201", title:"Pop quiz (in class)", date:"2026-11-19"},
   {id:"syl-eee370-0", courseId:"eee370", title:"Entrepreneurial Interview due 11:59 PM (15% of grade)", date:"2026-10-26", type:"deadline"},
   {id:"syl-eee370-1", courseId:"eee370", title:"Quiz #1 (in class)", date:"2026-09-17"},
   {id:"syl-eee370-2", courseId:"eee370", title:"Midterm Examination — full 80 min (in class)", date:"2026-10-15"},
@@ -4779,12 +4793,18 @@ function scheduleFor(dateIso){
     if(!courseRunsOn(dateIso, ev.courseId)) return;
     var course = COURSES.find(function(c){ return c.id === ev.courseId; });
     var off = isCancelled(dateIso, ev.courseId);
+    // A quiz or exam sitting inside a class slot is the single most useful
+    // thing the ribbon can say about that block, so it rides along with it.
+    var graded = [].concat(SYLLABUS_ASSIGNMENTS, BLACKBOARD_ASSIGNMENTS).filter(function(x){
+      return x.date === dateIso && x.courseId === ev.courseId && isExamOrQuiz(x);
+    });
     out.push({
       start: ev.start, end: ev.end,
       code: course ? course.code : ev.courseId,
       color: course ? course.color : "#8a8a85",
       room: off ? (cancellationReason(dateIso, ev.courseId) || "Cancelled") : (ev.room || ""),
-      off: off, exam: false
+      off: off, exam: false,
+      flag: (off || !graded.length) ? "" : graded[0].title
     });
   });
   finalExamsOn(dateIso).forEach(function(f){
@@ -4818,9 +4838,10 @@ function dayRibbonHtml(dateIso, blocks){
   var bars = blocks.map(function(b){
     var l = pct(minutesOf(b.start));
     var w = Math.max(1.4, pct(minutesOf(b.end)) - l);
-    return '<span class="daystrip-bar' + (b.exam ? " is-exam" : "") + (b.off ? " is-off" : "")
+    return '<span class="daystrip-bar' + (b.exam ? " is-exam" : "") + (b.flag ? " is-flagged" : "") + (b.off ? " is-off" : "")
       + '" style="left:' + l.toFixed(2) + '%;width:' + w.toFixed(2) + '%;background:' + b.color + '"'
-      + ' title="' + escHtml(b.code + " · " + fmtClock(b.start) + "–" + fmtClock(b.end)) + '"></span>';
+      + ' title="' + escHtml(b.code + " · " + fmtClock(b.start) + "–" + fmtClock(b.end)
+          + (b.flag ? " · " + b.flag : "")) + '"></span>';
   }).join("");
 
   // The "now" line only makes sense on the actual current day, and only
@@ -4853,6 +4874,7 @@ function todayScheduleHtml(dateIso){
       + '<span class="d-time">' + fmtClock(b.start) + "–" + fmtClock(b.end) + '</span>'
       + '<span class="d-code">' + escHtml(b.code) + '</span>'
       + (b.room ? '<span class="d-room">' + escHtml(b.room) + '</span>' : '')
+      + (b.flag ? '<span class="d-flag">' + escHtml(b.flag) + '</span>' : '')
       + '</span></li>';
   }).join("");
   return ribbon + '<ul class="daylist">' + rows + '</ul>';
