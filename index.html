@@ -1180,6 +1180,14 @@
   .today-what{ color:var(--ink); }
   .today-what.is-exam{ color:var(--yellow); font-weight:600; }
   .today-empty{ font-size:12.5px; color:var(--ink-dim); font-style:italic; }
+  .today-overflow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-dim);
+    padding-left:15px;
+    opacity:.8;
+  }
+  .today-what{ overflow-wrap:anywhere; }
   .today-note{
     margin-top:10px;
     padding-top:10px;
@@ -4318,12 +4326,29 @@ function renderTodayPanel(){
       ? "Exam period \u2014 last day of the semester " + fmtDate(TERM.semesterEnd)
       : daysLeft + " day" + (daysLeft===1?"":"s") + " of class left \u00b7 last day " + fmtDate(TERM.lastDay);
 
+  // Blackboard titles can run to a full paragraph of instructions. The call
+  // sheet is a glance, not the assignment itself, so each line is clipped to
+  // a readable length with the full text kept on hover; the Study view holds
+  // the complete wording.
+  const MAX_ROWS = 5;
+  function clip(text, n){
+    const t = String(text).replace(/\s+/g, " ").trim();
+    return t.length > n ? t.slice(0, n - 1).replace(/[\s,;:\u2014-]+$/, "") + "\u2026" : t;
+  }
+  function esc(t){
+    return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
   function row(items, emptyMsg){
     if(!items.length) return '<div class="today-empty">'+emptyMsg+'</div>';
-    return '<ul class="today-list">' + items.map(i =>
+    const shown = items.slice(0, MAX_ROWS);
+    const extra = items.length - shown.length;
+    return '<ul class="today-list">' + shown.map(i =>
       '<li><span class="today-dot" style="background:'+(i.color||"#8a8a85")+'"></span>'
       + '<span class="today-when">'+fmtDate(i.date)+'</span>'
-      + '<span class="today-what'+(i.exam?" is-exam":"")+'">'+i.label+'</span></li>').join("") + '</ul>';
+      + '<span class="today-what'+(i.exam?" is-exam":"")+'" title="'+esc(i.label)+'">'
+      + esc(clip(i.label, 72))+'</span></li>').join("")
+      + (extra > 0 ? '<li class="today-overflow">+'+extra+' more</li>' : '')
+      + '</ul>';
   }
 
   el.innerHTML = `
