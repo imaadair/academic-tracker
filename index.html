@@ -1347,6 +1347,31 @@
   .posting-where.is-nyc{ color:var(--yellow); }
   .postings-hidden{ color:var(--ink-faint); }
   .postings.postings-empty{ background:transparent; border-style:dashed; }
+
+  /* --- scouted roles (found outside the tracked companies) ---------------- */
+  .scouted{
+    margin:26px auto 0;
+    max-width:var(--maxw);
+    background:var(--slate-card);
+    border:1px solid var(--hairline);
+    border-left:3px solid var(--yellow);
+    border-radius:4px;
+    padding:20px 24px 22px;
+  }
+  .scouted-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:14px; margin-bottom:16px; }
+  .scouted-kicker{
+    font-family:'Oswald',sans-serif; text-transform:uppercase;
+    letter-spacing:0.2em; font-weight:600; font-size:12px; color:var(--yellow);
+  }
+  .scouted-sub{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint); }
+  .scouted-list{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px 26px; }
+  .scouted-list li{ display:flex; flex-direction:column; gap:3px; padding-bottom:12px; border-bottom:1px solid var(--hairline-soft); }
+  .scouted-link{ font-size:14.5px; line-height:1.35; color:var(--ink); }
+  .scouted-link:hover{ color:var(--yellow); }
+  .scouted-co{ font-family:'Oswald',sans-serif; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim); }
+  .scouted-meta{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); }
+  .scouted-why{ font-size:12.5px; line-height:1.5; color:var(--ink-dim); margin-top:2px; }
+  .scouted .posting-more{ margin-top:16px; }
   .filter-btn.loc-toggle{ border-color:var(--yellow-dim); color:var(--yellow); }
   .filter-btn.loc-toggle:hover{ border-color:var(--yellow); }
   .filter-btn.loc-toggle.active{ background:var(--yellow); color:#14161A; border-color:var(--yellow); }
@@ -1580,6 +1605,7 @@
   <h2>Internship Pipeline</h2>
   <div class="section-sub">Auto-checked career pages — see the action bar above for anything time-sensitive</div>
 </div>
+<div id="discoveredPanel"></div>
 <div class="grid" id="grid"></div>
 
 </section>
@@ -2086,6 +2112,21 @@ const THESIS_REFERENCE = [
    to Eastern time (Pacific + 3 hours, matching Syracuse's timezone). Times
    are 24-hour "HH:MM". Edit here if your schedule changes.
    ====================================================================== */
+/* ======================================================================
+   SCOUTED ROLES — relevant Summer 2027 internships found OUTSIDE the 15
+   tracked companies. The tracked list is a watchlist of employers Ima
+   already cares about; this is the open-ended half of the daily scan, so a
+   good role at a studio, network, production company, agency or streamer
+   she hasn't thought to track still reaches her.
+
+   Written by the daily scheduled task. Shape:
+     {id, company, title, url, location:{label,nyc,remote}, found, why}
+   "why" is one short line on why it fits her (development / production /
+   media strategy / TRF-adjacent). Entries are removed by the task once the
+   posting closes. Keep this list focused: quality over volume.
+   ====================================================================== */
+const DISCOVERED = [];
+
 const CLASS_SCHEDULE = [
   {courseId:"hnr350", day:"Mon", start:"12:45", end:"14:05", room:"Bowne Hall 306D"},
   {courseId:"trf340", day:"Mon", start:"14:15", end:"17:30", room:"Marley 216"},
@@ -2706,6 +2747,7 @@ function rerenderAll(){
   renderThesisStrategy();
   renderThesisRequirements();
   renderThesisReference();
+  renderDiscovered();
   renderTodayPanel();
 }
 
@@ -2961,6 +3003,11 @@ async function render(){
         const rest = ps.length - LEAD;
         actionItems.push(`<b>${c.company}</b> — ${ps.length} role${ps.length===1?"":"s"} open: ` + head +
           (rest > 0 ? ` <span class="action-count">and ${rest} more — see the Pipeline tab</span>` : ``));
+      } else if(nycOnly && (c.postings || []).length){
+        // Open, but every live posting is somewhere else. Saying "apply now"
+        // here would be wrong, and silently dropping the company would hide
+        // that it is worth watching.
+        actionItems.push(`<b>${c.company}</b> — open, but no New York roles right now (${c.postings.length} listed elsewhere). Turn off the NYC filter to see them.`);
       } else {
         actionItems.push(`<b>${c.company}</b> — marked open. Apply with the ${c.company==="LAIKA Studios"?"LAIKA":"matching"} resume + cover letter if you haven't yet.`);
       }
@@ -4513,12 +4560,19 @@ function renderNycToggle(){
   b.textContent = (nycOnly ? "\u25c9" : "\u25cb") + " NYC / remote only";
   b.setAttribute("aria-pressed", nycOnly ? "true" : "false");
 }
+document.getElementById("discoveredPanel").addEventListener("click", (e)=>{
+  const b = e.target.closest(".posting-more");
+  if(!b) return;
+  postingExpanded.__scouted = !postingExpanded.__scouted;
+  renderDiscovered();
+});
 document.getElementById("nycToggleBtn").addEventListener("click", ()=>{
   nycOnly = !nycOnly;
   try{ localStorage.setItem("internship-tracker:nycOnly", nycOnly ? "1" : "0"); }catch(_){}
   postingExpanded = {};
   renderNycToggle();
   render();
+  renderDiscovered();
   renderTodayPanel();
 });
 renderNycToggle();
@@ -4535,6 +4589,37 @@ document.getElementById("viewTabs").addEventListener("click", (e)=>{
    them. Shows the next seven days of school deadlines and coursework,
    anything in the exam period, and how the pipeline currently stands.
    ====================================================================== */
+/* Scouted roles panel. Hidden entirely when the scan has found nothing, so
+   an empty shell never sits on the page pretending to be a feature. */
+function renderDiscovered(){
+  const el = document.getElementById("discoveredPanel");
+  if(!el) return;
+  const items = (DISCOVERED || []).filter(postingMatchesLocation)
+    .slice().sort((a,b) => (b.found || "").localeCompare(a.found || ""));
+  if(!items.length){ el.innerHTML = ""; return; }
+  const expanded = !!postingExpanded.__scouted;
+  const CAP = 8;
+  const shown = expanded ? items : items.slice(0, CAP);
+  const rest = items.length - shown.length;
+  el.innerHTML = `
+    <div class="scouted">
+      <div class="scouted-head">
+        <span class="scouted-kicker">Scouted</span>
+        <span class="scouted-sub">${items.length} role${items.length===1?"":"s"} found outside your tracked companies</span>
+      </div>
+      <ul class="scouted-list">
+        ${shown.map(d => `
+          <li>
+            <a href="${d.url}" target="_blank" rel="noopener" class="scouted-link">${d.title}</a>
+            <span class="scouted-co">${d.company}</span>
+            <span class="scouted-meta">${d.location ? `<span class="posting-where${(d.location.nyc||d.location.remote)?" is-nyc":""}">${d.location.remote ? "Remote" : (d.location.label||"")}</span>` : ``}${d.found ? ` \u00b7 found ${fmtDate(d.found)}` : ``}</span>
+            ${d.why ? `<span class="scouted-why">${d.why}</span>` : ``}
+          </li>`).join("")}
+      </ul>
+      ${rest > 0 || expanded ? `<button type="button" class="posting-more" data-company="__scouted">${rest > 0 ? `Show ${rest} more` : "Show fewer"}</button>` : ``}
+    </div>`;
+}
+
 function renderTodayPanel(){
   const el = document.getElementById("todayPanel");
   if(!el) return;
@@ -4648,6 +4733,7 @@ renderThesis();
 renderThesisStrategy();
 renderThesisRequirements();
 renderThesisReference();
+renderDiscovered();
 renderTodayPanel();
 
 let bootView = "pipeline";
