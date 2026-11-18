@@ -1463,6 +1463,68 @@
     color:var(--ink-faint);
     font-weight:500;
   }
+  /* ---- Today's schedule, drawn rather than listed -------------------
+     The ribbon maps the working day (8 AM to 9 PM) onto one bar, so the
+     shape of the day reads before any of the words do: where the blocks
+     sit, how wide the gaps are, and where "now" falls. A day with nothing
+     on it keeps the bar and fills it with the slate hatch from the page
+     header, which is a real answer rather than an empty box. */
+  .daystrip{
+    position:relative;
+    height:30px;
+    border-radius:3px;
+    background:var(--slate);
+    border:1px solid var(--hairline-soft);
+    overflow:hidden;
+  }
+  .daystrip.is-clear{
+    background:
+      repeating-linear-gradient(-45deg,
+        var(--hairline) 0 5px,
+        rgba(0,0,0,0) 5px 11px),
+      var(--slate);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .daystrip-clear{
+    font-family:'Oswald',sans-serif;
+    font-size:9.5px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    background:var(--slate-card);
+    padding:4px 9px;
+    border-radius:2px;
+  }
+  .daystrip-bar{ position:absolute; top:5px; bottom:5px; border-radius:2px; }
+  .daystrip-bar.is-exam{ box-shadow:inset 0 0 0 1px var(--slate); }
+  .daystrip-bar.is-off{ opacity:0.3; }
+  .daystrip-now{ position:absolute; top:0; bottom:0; width:1px; background:var(--yellow); }
+  .daystrip-now::before{
+    content:"";
+    position:absolute; top:0; left:-2px;
+    width:5px; height:5px; border-radius:50%;
+    background:var(--yellow);
+  }
+  .daystrip-ticks{ position:relative; height:13px; margin-top:5px; }
+  .daystrip-ticks span{
+    position:absolute;
+    transform:translateX(-50%);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    color:var(--ink-faint);
+  }
+  .daylist{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:9px; }
+  .daylist li{ display:flex; align-items:stretch; gap:9px; font-size:13px; line-height:1.4; }
+  .daylist .d-rail{ width:3px; border-radius:2px; flex:0 0 3px; }
+  .daylist .d-body{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 9px; min-width:0; }
+  .daylist .d-time{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); white-space:nowrap; }
+  .daylist .d-code{ font-family:'Oswald',sans-serif; font-size:12.5px; letter-spacing:0.06em; color:var(--ink); }
+  .daylist .d-room{ font-size:11.5px; color:var(--ink-faint); overflow-wrap:anywhere; }
+  .daylist li.is-off .d-code{ color:var(--ink-faint); text-decoration:line-through; }
+  .daylist li.is-off .d-rail{ opacity:0.3; }
+  .daystrip-none{ margin-top:14px; font-size:13.5px; color:var(--ink-faint); }
   .today-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; }
   .today-list li{ display:flex; align-items:baseline; gap:9px; font-size:13.5px; line-height:1.45; }
   .today-dot{ width:6px; height:6px; border-radius:50%; flex:0 0 6px; transform:translateY(-2px); }
@@ -4679,6 +4741,120 @@ function renderDiscovered(){
     </div>`;
 }
 
+/* ----------------------------------------------------------------------
+   TODAY'S SCHEDULE RIBBON
+   Built from CLASS_SCHEDULE and FINAL_EXAMS through the same term-aware
+   helpers the calendar uses, so a day the calendar calls empty is empty
+   here too. Cancelled meetings stay visible but faded and struck through:
+   knowing a class was cancelled is different from it never existing.
+   ---------------------------------------------------------------------- */
+var DAY_WINDOW_START = 8 * 60;    // 8:00 AM
+var DAY_WINDOW_END   = 21 * 60;   // 9:00 PM
+
+function minutesOf(hhmm){
+  var p = String(hhmm).split(":");
+  return (Number(p[0]) || 0) * 60 + (Number(p[1]) || 0);
+}
+/* Compact clock for a narrow column: "12:45p", "2p". */
+function fmtClock(hhmm){
+  var p = String(hhmm).split(":");
+  var h = Number(p[0]), m = Number(p[1]) || 0;
+  var suffix = h < 12 ? "a" : "p";
+  var hour = (h % 12 === 0) ? 12 : (h % 12);
+  return hour + (m ? ":" + String(m).padStart(2, "0") : "") + suffix;
+}
+function escHtml(t){
+  return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+                  .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function scheduleFor(dateIso){
+  var name = WEEKDAY_NAMES[parseLocalDate(dateIso).getDay()];
+  var out = [];
+  CLASS_SCHEDULE.forEach(function(ev){
+    if(ev.day !== name) return;
+    if(!courseRunsOn(dateIso, ev.courseId)) return;
+    var course = COURSES.find(function(c){ return c.id === ev.courseId; });
+    var off = isCancelled(dateIso, ev.courseId);
+    out.push({
+      start: ev.start, end: ev.end,
+      code: course ? course.code : ev.courseId,
+      color: course ? course.color : "#8a8a85",
+      room: off ? (cancellationReason(dateIso, ev.courseId) || "Cancelled") : (ev.room || ""),
+      off: off, exam: false
+    });
+  });
+  finalExamsOn(dateIso).forEach(function(f){
+    var course = COURSES.find(function(c){ return c.id === f.courseId; });
+    out.push({
+      start: f.start, end: f.end,
+      code: (course ? course.code : "") + " final",
+      color: "#F2B134", room: "Final exam", off: false, exam: true
+    });
+  });
+  out.sort(function(a,b){ return minutesOf(a.start) - minutesOf(b.start); });
+  return out;
+}
+
+function dayRibbonHtml(dateIso, blocks){
+  var span = DAY_WINDOW_END - DAY_WINDOW_START;
+  function pct(m){
+    var clamped = Math.max(DAY_WINDOW_START, Math.min(DAY_WINDOW_END, m));
+    return ((clamped - DAY_WINDOW_START) / span) * 100;
+  }
+  var ticks = '<div class="daystrip-ticks">'
+    + [[8*60,"8a"],[12*60,"12p"],[16*60,"4p"],[21*60,"9p"]].map(function(t){
+        return '<span style="left:' + pct(t[0]).toFixed(2) + '%">' + t[1] + '</span>';
+      }).join("")
+    + '</div>';
+
+  if(!blocks.length){
+    return '<div class="daystrip is-clear"><span class="daystrip-clear">Clear</span></div>' + ticks;
+  }
+
+  var bars = blocks.map(function(b){
+    var l = pct(minutesOf(b.start));
+    var w = Math.max(1.4, pct(minutesOf(b.end)) - l);
+    return '<span class="daystrip-bar' + (b.exam ? " is-exam" : "") + (b.off ? " is-off" : "")
+      + '" style="left:' + l.toFixed(2) + '%;width:' + w.toFixed(2) + '%;background:' + b.color + '"'
+      + ' title="' + escHtml(b.code + " · " + fmtClock(b.start) + "–" + fmtClock(b.end)) + '"></span>';
+  }).join("");
+
+  // The "now" line only makes sense on the actual current day, and only
+  // while the clock is inside the window the ribbon draws.
+  var nowBar = "";
+  if(dateIso === todayIso()){
+    var n = new Date();
+    var mins = n.getHours() * 60 + n.getMinutes();
+    if(mins >= DAY_WINDOW_START && mins <= DAY_WINDOW_END){
+      nowBar = '<span class="daystrip-now" style="left:' + pct(mins).toFixed(2) + '%" title="Now"></span>';
+    }
+  }
+  return '<div class="daystrip">' + bars + nowBar + '</div>' + ticks;
+}
+
+function todayScheduleHtml(dateIso){
+  var blocks = scheduleFor(dateIso);
+  var kind = termDayKind(dateIso);
+  var ribbon = dayRibbonHtml(dateIso, blocks);
+  if(!blocks.length){
+    var why = (kind === "class" || kind === "finals")
+      ? "No classes today."
+      : (TERM_DAY_LABEL[kind] || "No classes today.");
+    return ribbon + '<div class="daystrip-none">' + escHtml(why) + '</div>';
+  }
+  var rows = blocks.map(function(b){
+    return '<li class="' + (b.off ? "is-off" : "") + '">'
+      + '<span class="d-rail" style="background:' + b.color + '"></span>'
+      + '<span class="d-body">'
+      + '<span class="d-time">' + fmtClock(b.start) + "–" + fmtClock(b.end) + '</span>'
+      + '<span class="d-code">' + escHtml(b.code) + '</span>'
+      + (b.room ? '<span class="d-room">' + escHtml(b.room) + '</span>' : '')
+      + '</span></li>';
+  }).join("");
+  return ribbon + '<ul class="daylist">' + rows + '</ul>';
+}
+
 function renderTodayPanel(){
   const el = document.getElementById("todayPanel");
   if(!el) return;
@@ -4760,8 +4936,9 @@ function renderTodayPanel(){
     </div>
     <div class="today-cols">
       <div class="today-col">
-        <h4>Due in the next 7 days</h4>
-        ${row(near, "Nothing due in the next week.")}
+        <h4>Today \u00b7 ${fmtDate(today)}</h4>
+        ${todayScheduleHtml(today)}
+        ${near.length ? `<div class="today-note">${near.length} thing${near.length===1?"":"s"} due in the next 7 days \u2014 see Study.</div>` : ``}
       </div>
       <div class="today-col">
         <h4>School deadlines</h4>
@@ -4810,6 +4987,8 @@ setView(bootView, false);
 renderSyncStatus();
 ghSyncPull().then(res => { ghApplyRemote(res); renderSyncStatus(); });
 setInterval(()=>{ ghSyncPull().then(ghApplyRemote); }, 45000);
+// Keep the call sheet's "now" marker and day boundary current without a reload.
+setInterval(renderTodayPanel, 300000);
 document.addEventListener("visibilitychange", ()=>{
   if(document.visibilityState === "visible") ghSyncPull().then(ghApplyRemote);
 });
