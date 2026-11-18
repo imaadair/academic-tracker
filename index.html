@@ -4879,7 +4879,6 @@ function renderTodayPanel(){
                    color:course?course.color:"#8a8a85", exam:true, far:true});
   });
   upcoming.sort((a,b) => a.date.localeCompare(b.date));
-  const near = upcoming.filter(u => !u.far || u.date <= horizon);
   const finalsAhead = upcoming.filter(u => u.far && u.date > horizon);
 
   // school deadlines in the next 7 days
@@ -4941,7 +4940,6 @@ function renderTodayPanel(){
       <div class="today-col">
         <h4>Today \u00b7 ${fmtDate(today)}</h4>
         ${todayScheduleHtml(today)}
-        ${near.length ? `<div class="today-note">${near.length} thing${near.length===1?"":"s"} due in the next 7 days \u2014 see Study.</div>` : ``}
       </div>
       <div class="today-col">
         <h4>School deadlines</h4>
