@@ -3601,6 +3601,25 @@ const TERM_DAY_LABEL = {
   break:   "Winter break",
   nextterm:"Spring 2027",
 };
+/* Days from tomorrow through the last day of classes on which at least one
+   course actually meets. Calendar days are the wrong unit here: Ima has no
+   Friday classes and Thanksgiving week is cancelled, so "21 days until Dec 8"
+   overstated what is left by more than half. */
+function remainingClassDays(fromIso){
+  const start = parseLocalDate(fromIso || todayIso());
+  const end = parseLocalDate(TERM.lastDay);
+  let count = 0;
+  const d = new Date(start.getTime());
+  d.setDate(d.getDate() + 1);                       // strictly after today
+  while(d <= end){
+    const iso = isoDate(d);
+    const name = WEEKDAY_NAMES[d.getDay()];
+    if(CLASS_SCHEDULE.some(ev => ev.day === name && classMeetsOn(iso, ev.courseId))) count++;
+    d.setDate(d.getDate() + 1);
+  }
+  return count;
+}
+
 /* Seated final exams falling on a given date. */
 function finalExamsOn(dateIso){
   return FINAL_EXAMS.filter(f => f.final === true && f.date === dateIso);
@@ -4659,12 +4678,15 @@ function renderTodayPanel(){
     roles += groupPostings(visiblePostings(c.postings)).length;
   });
 
-  const daysLeft = Math.max(0, daysUntil(TERM.lastDay));
+  const classDaysLeft = remainingClassDays(today);
   const termLine = today > TERM.semesterEnd
     ? TERM.label + " is over \u2014 Spring 2027 begins " + fmtDate(TERM.nextTermFirstDay)
     : today > TERM.lastDay
       ? "Exam period \u2014 last day of the semester " + fmtDate(TERM.semesterEnd)
-      : daysLeft + " day" + (daysLeft===1?"":"s") + " of class left \u00b7 last day " + fmtDate(TERM.lastDay);
+      : (classDaysLeft === 0
+          ? "Last day of classes is " + fmtDate(TERM.lastDay)
+          : classDaysLeft + " more class day" + (classDaysLeft===1?"":"s")
+            + " \u00b7 last day " + fmtDate(TERM.lastDay));
 
   // Blackboard titles can run to a full paragraph of instructions. The call
   // sheet is a glance, not the assignment itself, so each line is clipped to
