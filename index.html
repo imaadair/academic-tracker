@@ -1554,8 +1554,17 @@
   @media (max-width: 700px){
     body{ font-size:14.5px; }
     .slate-top-stripe{ height:16px; margin-bottom:24px; }
-    .view-tabs{ gap:0; }
-    .view-tab{ padding:12px 13px; font-size:13px; letter-spacing:0.06em; }
+    /* One scrollable row rather than two wrapped ones: a sticky bar that
+       wraps costs ~90px of a phone screen on every scroll. */
+    .view-tabs{
+      gap:0;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      scrollbar-width:none;
+      -ms-overflow-style:none;
+    }
+    .view-tabs::-webkit-scrollbar{ display:none; }
+    .view-tab{ padding:12px 14px; font-size:13px; letter-spacing:0.06em; flex:0 0 auto; }
     .today-stats b{ font-size:26px; }
     .slate-sub{ gap:10px; flex-direction:column; }
   }
