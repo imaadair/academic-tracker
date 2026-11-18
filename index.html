@@ -8,18 +8,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#EDEAE1;
-    --ink-dim:#A8A49A;
-    --slate:#1A1A18;
-    --slate-card:#232320;
-    --slate-card-hover:#2A2A26;
-    --hairline:#3A3A35;
-    --red:#B0361B;
-    --red-bright:#D6491F;
-    --yellow:#E3AE33;
-    --green:#5C8A5A;
-    --blue:#4A7C9B;
-    --gray:#5A574F;
+    /* Cool neutral dark rather than the old brown-olive: the browns muddied
+       every surface together and left text sitting at poor contrast. */
+    --ink:#F4F3F0;
+    --ink-dim:#A7ADB5;
+    --ink-faint:#767D86;
+    --slate:#0D0E10;
+    --slate-card:#16181B;
+    --slate-card-hover:#1E2126;
+    --hairline:#2B3037;
+    --hairline-soft:#1F242A;
+    --red:#C4432A;
+    --red-bright:#E8603F;
+    --yellow:#F2B134;
+    --yellow-dim:#8A6A28;
+    --green:#5FA978;
+    --blue:#5B92C4;
+    --gray:#565C63;
     --radius:2px;
     /* One gutter and one max width for every full-bleed container, so the
        page keeps a single consistent measure instead of each section
@@ -1072,248 +1077,433 @@
   }
 
   /* ======================================================================
-     UPGRADE LAYER
-     Everything below refines the slate without replacing it: the same
-     clapperboard vocabulary (stripes, scene tags, mono labels), executed
-     to one measure, one spacing rhythm and one type scale.
+     PRESENTATION LAYER
+     The slate vocabulary kept — clapper stripes, scene tags, mono labels —
+     but rebuilt around three things the first pass got wrong: everything was
+     set in small monospace so the page read as terminal output; the browns
+     sat so close together that nothing had a surface; and the red action slab
+     fought the amber. Mono is now reserved for data (dates, counts, codes),
+     surfaces actually separate, and red appears as an accent, not a field.
      ====================================================================== */
 
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    font-size:15px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{ text-decoration:none; }
+  a:hover{ text-decoration:underline; text-underline-offset:2px; }
+
   /* --- one measure for every full-bleed container ---------------------- */
-  .slate-header > *, .action-bar, .jump-nav, .grid, .add-row, .schedule-note,
+  .slate-header > *, .action-bar, .grid, .add-row, .schedule-note,
   .schedule-wrap, .section-divider, .docs-panel, .controls, #careerTaskList,
   .view-tabs, .today-panel, .growth-panel, .message-alert-panel, .footer-note{
     max-width: var(--maxw);
     margin-left: auto;
     margin-right: auto;
   }
+  .grid{ align-items:start; gap:18px; margin-top:26px; }
 
-  /* Cards sit at the top of their grid row instead of stretching to match
-     the tallest card in the row, which is what left those long empty
-     columns beside the NBCUniversal card. */
-  .grid{ align-items: start; }
+  /* --- header ----------------------------------------------------------- */
+  .slate-header{
+    padding:0 0 26px;
+    border-bottom:1px solid var(--hairline);
+    background:#0A0B0C;
+  }
+  .slate-top-stripe{
+    height:22px;
+    margin-bottom:34px;
+    border-radius:0;
+    background:repeating-linear-gradient(-58deg,
+      var(--ink) 0 26px, #0A0B0C 26px 52px);
+  }
+  .slate-title{
+    font-size:clamp(30px,4.2vw,50px);
+    letter-spacing:0.012em;
+    line-height:1.02;
+    margin:0;
+    padding-left:var(--gutter);
+    padding-right:var(--gutter);
+  }
+  .slate-sub{
+    font-size:12px;
+    gap:28px;
+    margin-top:18px;
+    padding-left:var(--gutter);
+    padding-right:var(--gutter);
+    color:var(--ink-faint);
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  .slate-sub span b{ color:var(--ink); letter-spacing:0.02em; text-transform:none; font-size:13px; }
 
-  /* --- view tabs -------------------------------------------------------- */
+  /* --- action bar: an accented panel, not a red field ------------------- */
+  .action-bar{ margin:30px auto 0; }
+  .action-panel{
+    background:var(--slate-card);
+    color:var(--ink);
+    border:1px solid var(--hairline);
+    border-left:3px solid var(--red-bright);
+    border-radius:4px;
+    padding:18px 22px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    line-height:1.62;
+    letter-spacing:0;
+    box-shadow:none;
+  }
+  .action-panel .label{
+    color:var(--red-bright);
+    font-size:11px;
+    letter-spacing:0.18em;
+    margin-bottom:12px;
+  }
+  .action-panel ul{ padding-left:0; list-style:none; }
+  .action-panel li{ margin-bottom:9px; padding-left:16px; position:relative; }
+  .action-panel li:last-child{ margin-bottom:0; }
+  .action-panel li::before{
+    content:"";
+    position:absolute; left:0; top:9px;
+    width:5px; height:5px; border-radius:50%;
+    background:var(--red-bright);
+  }
+  .action-panel li b{ color:var(--ink); }
+  .action-panel a{ color:var(--yellow); }
+  .action-count{ color:var(--ink-faint); font-size:12.5px; }
+
+  /* --- controls / filters ------------------------------------------------ */
+  .controls{ margin-top:28px; gap:8px; align-items:center; }
+  .filter-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:8px 15px;
+    border-radius:999px;
+    border:1px solid var(--hairline);
+    background:transparent;
+    color:var(--ink-dim);
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .filter-btn:hover{ color:var(--ink); border-color:var(--ink-faint); }
+  .filter-btn.active{ background:var(--ink); color:#0D0E10; border-color:var(--ink); }
+  .last-check-note{ color:var(--ink-faint); font-size:12px; }
+
+  /* --- quick documents: a quiet utility strip ---------------------------- */
+  .docs-panel{
+    background:transparent;
+    border:0;
+    border-top:1px solid var(--hairline-soft);
+    border-bottom:1px solid var(--hairline-soft);
+    border-radius:0;
+    margin-top:26px;
+    padding-top:16px;
+    padding-bottom:16px;
+  }
+  .docs-title{
+    font-size:10.5px;
+    letter-spacing:0.2em;
+    color:var(--ink-faint);
+    margin-bottom:10px;
+  }
+  .docs-links{ gap:22px; }
+  .docs-links a{ font-size:13.5px; color:var(--ink-dim); }
+  .docs-links a:hover{ color:var(--yellow); }
+
+  /* --- view tabs --------------------------------------------------------- */
   .view-tabs{
     display:flex;
     flex-wrap:wrap;
-    gap:2px;
+    gap:4px;
     padding-left:var(--gutter);
     padding-right:var(--gutter);
-    margin-top:26px;
-    border-bottom:2px solid var(--hairline);
+    margin-top:40px;
+    border-bottom:1px solid var(--hairline);
   }
   .view-tab{
     appearance:none;
     background:transparent;
     border:0;
-    border-bottom:3px solid transparent;
-    margin-bottom:-2px;
-    color:var(--ink-dim);
+    border-bottom:2px solid transparent;
+    margin-bottom:-1px;
+    color:var(--ink-faint);
     font-family:'Oswald',sans-serif;
-    font-weight:600;
-    font-size:14px;
-    letter-spacing:0.1em;
+    font-weight:500;
+    font-size:15px;
+    letter-spacing:0.12em;
     text-transform:uppercase;
-    padding:12px 18px;
+    padding:14px 20px;
     cursor:pointer;
-    transition:color .15s ease, border-color .15s ease, background .15s ease;
+    transition:color .15s ease, border-color .15s ease;
   }
-  .view-tab:hover{ color:var(--ink); background:#ffffff08; }
+  .view-tab:hover{ color:var(--ink-dim); }
   .view-tab.active{ color:var(--ink); border-bottom-color:var(--yellow); }
-  .view-tab:focus-visible{ outline:2px solid var(--yellow); outline-offset:-2px; }
   .view.is-hidden{ display:none; }
 
-  /* --- today / call sheet panel ---------------------------------------- */
-  .today-panel{
-    margin-top:26px;
-    padding:0 var(--gutter);
+  /* --- section headers --------------------------------------------------- */
+  .section-divider{
+    margin-top:46px;
+    padding-top:0;
+    border-top:0;
   }
-  .today-head{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:baseline;
-    gap:14px;
-    padding-bottom:10px;
+  .scene-tag{
+    font-size:10.5px;
+    letter-spacing:0.22em;
+    color:var(--yellow-dim);
+    margin-bottom:10px;
   }
-  .today-kicker{
-    font-family:'Oswald',sans-serif;
-    text-transform:uppercase;
-    letter-spacing:0.16em;
-    font-weight:700;
-    font-size:12px;
-    color:var(--yellow);
-  }
-  .today-term{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    color:var(--ink-dim);
-    letter-spacing:0.03em;
-  }
-  .today-cols{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-    gap:1px;
-    background:var(--hairline);
-    border:1px solid var(--hairline);
-    border-radius:var(--radius);
-    overflow:hidden;
-  }
-  .today-col{ background:var(--slate-card); padding:14px 16px 16px; }
-  .today-col h4{
+  .section-divider h2{
+    font-size:clamp(23px,2.6vw,32px);
+    letter-spacing:0.02em;
     margin:0 0 10px;
-    font-family:'Oswald',sans-serif;
-    font-size:11px;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
+    line-height:1.1;
+  }
+  .section-sub{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    line-height:1.6;
     color:var(--ink-dim);
-    font-weight:600;
+    max-width:76ch;
+    letter-spacing:0;
+    text-transform:none;
   }
-  .today-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
-  .today-list li{ display:flex; align-items:baseline; gap:8px; font-size:12.5px; line-height:1.4; }
-  .today-dot{ width:7px; height:7px; border-radius:50%; flex:0 0 7px; transform:translateY(-1px); }
-  .today-when{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
+
+  /* --- cards -------------------------------------------------------------- */
+  .card, .deadline-card, .contact-card{
+    background:var(--slate-card);
+    border:1px solid var(--hairline);
+    border-radius:4px;
+    padding:20px;
+    transition:background .15s ease, border-color .15s ease, transform .15s ease;
+  }
+  .card:hover, .deadline-card:hover, .contact-card:hover{
+    background:var(--slate-card-hover);
+    border-color:#3A4149;
+  }
+  .card-company, .contact-name, .deadline-title{
+    font-size:18px;
+    letter-spacing:0.03em;
+    line-height:1.2;
+  }
+  .card-position{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
     color:var(--ink-dim);
-    white-space:nowrap;
-    flex:0 0 auto;
+    text-transform:none;
+    letter-spacing:0;
+    margin-bottom:12px;
   }
-  .today-what{ color:var(--ink); }
-  .today-what.is-exam{ color:var(--yellow); font-weight:600; }
-  .today-empty{ font-size:12.5px; color:var(--ink-dim); font-style:italic; }
-  .today-overflow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
+  .card-meta, .contact-notes, .contact-meta, .contact-sub{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    line-height:1.58;
     color:var(--ink-dim);
-    padding-left:15px;
-    opacity:.8;
+    letter-spacing:0;
   }
-  .today-what{ overflow-wrap:anywhere; }
-  .today-note{
-    margin-top:10px;
-    padding-top:10px;
-    border-top:1px solid var(--hairline);
-    font-size:11px;
-    line-height:1.5;
-    color:var(--ink-dim);
-    font-family:'IBM Plex Mono',monospace;
-  }
-  .today-stats{ display:flex; gap:20px; flex-wrap:wrap; }
-  .today-stats div{ display:flex; flex-direction:column; gap:2px; }
-  .today-stats b{
-    font-family:'Oswald',sans-serif;
-    font-size:28px;
-    line-height:1;
-    font-weight:700;
-    color:var(--ink);
-  }
-  .today-stats span{
+  .status-pill{
     font-family:'IBM Plex Mono',monospace;
     font-size:10.5px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    color:var(--ink-dim);
-  }
-
-  /* --- academic-calendar day kinds in the weekly viewer ----------------- */
-  .schedule-day-header .day-kind{
-    display:block;
-    font-style:normal;
-    font-size:9.5px;
-    letter-spacing:0.08em;
-    margin-top:3px;
-    color:var(--yellow);
-    opacity:.85;
-  }
-  .schedule-day-header.kind-reading .day-kind,
-  .schedule-day-header.kind-break .day-kind,
-  .schedule-day-header.kind-preterm .day-kind,
-  .schedule-day-header.kind-nextterm .day-kind{ color:var(--ink-dim); }
-  .schedule-day-header.kind-finals{ background:#E3AE3314; }
-  .schedule-day-header.kind-reading,
-  .schedule-day-header.kind-break,
-  .schedule-day-header.kind-preterm,
-  .schedule-day-header.kind-nextterm{ background:#ffffff06; }
-
-  /* --- final exam blocks ------------------------------------------------ */
-  .schedule-block.is-final{
-    border:2px solid var(--ink);
-    box-shadow:0 0 0 1px #0006 inset;
-  }
-  .schedule-block .final-tag{
-    font-family:'Oswald',sans-serif;
-    font-weight:700;
-    font-size:9.5px;
     letter-spacing:0.12em;
-    background:#00000055;
-    padding:1px 5px;
-    border-radius:1px;
-    align-self:flex-start;
-    margin:2px 0;
+    padding:4px 10px;
+    border-radius:999px;
   }
+  .apply-now-btn{
+    border-radius:3px;
+    font-size:13px;
+    letter-spacing:0.12em;
+    padding:11px 14px;
+  }
+  .card-links a, .apply-link{ font-size:13px; }
 
-  /* --- grouped / capped postings ---------------------------------------- */
-  .posting-alts{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-    align-items:center;
-    margin-top:3px;
+  /* --- postings ----------------------------------------------------------- */
+  .postings{
+    border:1px solid var(--hairline-soft);
+    border-radius:3px;
+    background:#0F1113;
+    padding:12px 14px;
+    margin:12px 0;
   }
+  .postings-label{
+    font-size:10px;
+    letter-spacing:0.16em;
+    color:var(--ink-faint);
+    margin-bottom:10px;
+  }
+  .posting-item{ padding:6px 0; border-bottom:1px solid var(--hairline-soft); }
+  .posting-item:last-of-type{ border-bottom:0; }
+  .posting-link{
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    line-height:1.45;
+    color:var(--ink);
+    letter-spacing:0;
+  }
+  .posting-link:hover{ color:var(--yellow); }
+  .posting-meta{ font-size:11px; color:var(--ink-faint); margin-top:2px; }
+  .posting-where{ color:var(--ink-faint); }
+  .posting-where.is-nyc{ color:var(--yellow); }
+  .postings-hidden{ color:var(--ink-faint); }
+  .postings.postings-empty{ background:transparent; border-style:dashed; }
+  .filter-btn.loc-toggle{ border-color:var(--yellow-dim); color:var(--yellow); }
+  .filter-btn.loc-toggle:hover{ border-color:var(--yellow); }
+  .filter-btn.loc-toggle.active{ background:var(--yellow); color:#14161A; border-color:var(--yellow); }
+  .posting-alts{ display:flex; flex-wrap:wrap; gap:5px; align-items:center; margin-top:4px; }
   .posting-alts a{
     font-family:'IBM Plex Mono',monospace;
     font-size:10.5px;
     border:1px solid var(--hairline);
-    border-radius:1px;
-    padding:1px 5px;
-    text-decoration:none;
-    color:var(--ink-dim);
+    border-radius:2px;
+    padding:1px 6px;
+    color:var(--ink-faint);
   }
-  .posting-alts a:hover{ color:var(--yellow); border-color:var(--yellow); }
-  .posting-alts-note{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10px;
-    color:var(--ink-dim);
-    opacity:.75;
-  }
+  .posting-alts a:hover{ color:var(--yellow); border-color:var(--yellow-dim); text-decoration:none; }
+  .posting-alts-note{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); }
   .posting-more{
     appearance:none;
-    margin-top:8px;
+    margin-top:10px;
     background:transparent;
-    border:1px dashed var(--hairline);
-    border-radius:var(--radius);
+    border:1px solid var(--hairline);
+    border-radius:3px;
     color:var(--ink-dim);
     font-family:'IBM Plex Mono',monospace;
     font-size:11.5px;
-    letter-spacing:0.03em;
-    padding:6px 10px;
+    padding:7px 10px;
     cursor:pointer;
     width:100%;
     transition:color .15s ease, border-color .15s ease;
   }
-  .posting-more:hover{ color:var(--yellow); border-color:var(--yellow); }
+  .posting-more:hover{ color:var(--yellow); border-color:var(--yellow-dim); }
 
-  /* --- focus visibility across the page --------------------------------- */
+  /* --- call sheet ---------------------------------------------------------- */
+  .today-panel{ margin-top:34px; padding:0 var(--gutter); }
+  .today-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:16px; padding-bottom:14px; }
+  .today-kicker{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.2em;
+    font-weight:600;
+    font-size:12px;
+    color:var(--yellow);
+  }
+  .today-term{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-faint); }
+  .today-cols{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:1px;
+    background:var(--hairline);
+    border:1px solid var(--hairline);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .today-col{ background:var(--slate-card); padding:18px 20px 20px; }
+  .today-col h4{
+    margin:0 0 14px;
+    font-family:'Oswald',sans-serif;
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
+  .today-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:11px; }
+  .today-list li{ display:flex; align-items:baseline; gap:9px; font-size:13.5px; line-height:1.45; }
+  .today-dot{ width:6px; height:6px; border-radius:50%; flex:0 0 6px; transform:translateY(-2px); }
+  .today-when{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); white-space:nowrap; flex:0 0 auto; }
+  .today-what{ color:var(--ink-dim); overflow-wrap:anywhere; }
+  .today-what.is-exam{ color:var(--yellow); font-weight:500; }
+  .today-empty{ font-size:13.5px; color:var(--ink-faint); }
+  .today-overflow{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); padding-left:15px; }
+  .today-note{
+    margin-top:14px; padding-top:14px;
+    border-top:1px solid var(--hairline-soft);
+    font-size:11.5px; line-height:1.55; color:var(--ink-faint);
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .today-stats{ display:flex; gap:26px; flex-wrap:wrap; }
+  .today-stats div{ display:flex; flex-direction:column; gap:3px; }
+  .today-stats b{ font-family:'Oswald',sans-serif; font-size:34px; line-height:1; font-weight:600; color:var(--ink); }
+  .today-stats span{ font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); }
+
+  /* --- weekly schedule ------------------------------------------------------ */
+  .schedule-note{
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--ink-dim);
+    max-width:80ch;
+  }
+  .schedule-day-header{ font-size:11.5px; color:var(--ink-dim); padding:10px 4px; }
+  .schedule-day-header .day-kind{
+    display:block; font-style:normal; font-size:9.5px;
+    letter-spacing:0.1em; margin-top:4px; color:var(--yellow); opacity:.9;
+  }
+  .schedule-day-header.kind-reading .day-kind,
+  .schedule-day-header.kind-break .day-kind,
+  .schedule-day-header.kind-preterm .day-kind,
+  .schedule-day-header.kind-nextterm .day-kind{ color:var(--ink-faint); }
+  .schedule-day-header.kind-finals{ background:#F2B1341A; }
+  .schedule-day-header.kind-reading,
+  .schedule-day-header.kind-break,
+  .schedule-day-header.kind-preterm,
+  .schedule-day-header.kind-nextterm{ background:#ffffff08; }
+  .schedule-block{ border-radius:3px; }
+  .schedule-block.is-final{ border:2px solid var(--ink); }
+  .schedule-block .final-tag{
+    font-family:'Oswald',sans-serif; font-weight:600; font-size:9.5px;
+    letter-spacing:0.14em; background:#00000066; padding:2px 6px;
+    border-radius:2px; align-self:flex-start; margin:3px 0;
+  }
+
+  /* --- misc panels ----------------------------------------------------------- */
+  .growth-panel, .message-alert-panel, .thesis-ref{
+    background:var(--slate-card);
+    border:1px solid var(--hairline);
+    border-radius:4px;
+  }
+  .growth-panel li, .growth-panel p{ font-size:13.5px; line-height:1.62; }
+  .footer-note{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    line-height:1.7;
+    color:var(--ink-faint);
+    border-top:1px solid var(--hairline);
+    margin-top:64px;
+    padding-top:28px;
+  }
+  .footer-note b{ color:var(--ink-dim); }
+  .add-row input, .add-event-row input, select{
+    background:#0F1113;
+    border:1px solid var(--hairline);
+    border-radius:3px;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    padding:9px 11px;
+  }
+  .add-btn{ border-radius:3px; font-size:12.5px; letter-spacing:0.08em; padding:9px 16px; }
+
+  /* --- focus + motion --------------------------------------------------------- */
   a:focus-visible, button:focus-visible, input:focus-visible,
   select:focus-visible, textarea:focus-visible{
     outline:2px solid var(--yellow);
     outline-offset:2px;
+    border-radius:2px;
   }
-
-  /* --- motion ----------------------------------------------------------- */
   @media (prefers-reduced-motion: reduce){
-    *, *::before, *::after{
-      animation-duration:.001ms !important;
-      transition-duration:.001ms !important;
-    }
+    *, *::before, *::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
   }
 
   @media (max-width: 700px){
+    body{ font-size:14.5px; }
+    .slate-top-stripe{ height:16px; margin-bottom:24px; }
     .view-tabs{ gap:0; }
-    .view-tab{ padding:11px 12px; font-size:12.5px; letter-spacing:0.06em; }
-    .today-stats b{ font-size:22px; }
+    .view-tab{ padding:12px 13px; font-size:13px; letter-spacing:0.06em; }
+    .today-stats b{ font-size:26px; }
+    .slate-sub{ gap:10px; flex-direction:column; }
   }
-
 </style>
 </head>
 <body>
@@ -1341,6 +1531,7 @@
   <button class="filter-btn" data-filter="open">Open / Apply now</button>
   <button class="filter-btn" data-filter="soon">Opening soon</button>
   <button class="filter-btn" data-filter="applied">Applied</button>
+  <button class="filter-btn loc-toggle active" id="nycToggleBtn" type="button" style="margin-left:8px;">◉ NYC / remote only</button>
   <button class="filter-btn" id="syncToggleBtn" style="margin-left:8px;">⚙ Sync: Off</button>
   <span class="last-check-note" id="lastCheckLabel"></span>
 </div>
@@ -1481,7 +1672,7 @@
   <br><br>
   <b>Term calendar (Fall 2026):</b> classes run <b>Mon Aug 24 – Tue Dec 8</b>. Reading days are Dec 9, 12 and 13; final examinations run Dec 10–11 and Dec 14–15; the semester ends Dec 15. These come from Syracuse's official 2026–27 Academic Calendar and the Registrar's Fall 2026 Final Examination Schedule. The weekly viewer stops drawing classes after the last day of classes and after any course's own earlier final meeting — before this was added it drew your schedule forever, straight through winter break.
   <br><br>
-  <b>Final exams:</b> exam dates and times are fixed by the Registrar from each course's meeting pattern and are "not subject to change, either by student or faculty request." <b>ACC 201</b> sits Tue Dec 15, 10:15 AM–12:15 PM; <b>HNR 350</b> sits Mon Dec 14, 12:45–2:45 PM. <b>EEE 370</b>, <b>PHI 311</b> and <b>TRF 444</b> have no seated final — they finish on coursework. <b>TRF 340</b> is unknown because the course is still listed Closed on Blackboard.
+  <b>Final exams:</b> exam dates and times are fixed by the Registrar from each course's meeting pattern and are "not subject to change, either by student or faculty request." you sit two, both on <b>Tuesday Dec 15</b>: <b>ACC 201</b> at 10:15 AM–12:15 PM and <b>TRF 340</b> at 3:00–5:00 PM. <b>EEE 370</b>, <b>PHI 311</b>, <b>TRF 444</b> and <b>HNR 350</b> have no seated final — they finish on coursework. (HNR 350's syllabus does list a university slot on Dec 14, but the course isn't using it.)
   <br><br>
   <b>Folder structure needed:</b> for the Resume/Cover letter links on each card to work, keep this file alongside a <code>files/</code> subfolder containing all your resumes, cover letters, and <code>Ima_Kennerly_References.docx</code>.
   <br><br>
@@ -1517,15 +1708,15 @@
 const LAST_AUTO_CHECK = "2026-11-17";
 
 const COMPANIES = [
-  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"open", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[{title:"Software Engineer Intern - Summer 2027", url:"https://explore.jobs.netflix.net/careers/job/790318904468", found:"2026-10-20"}, {title:"Strategy MBA Internship, Summer 2027", url:"https://explore.jobs.netflix.net/careers/job/790319427586", found:"2026-11-13"}]},
-  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"APPLIED 2026-11-16 to all 4 roles via SmartRecruiters guest Easy Apply: Film Production & Development, Program Management & Operations, Universal TV Marketing/Comms/Brand Strategy, and Finance. Each got the universal resume, its own cover letter, and the Syracuse advising transcript. Confirmation emails go to [redacted]. ALSO already applied independently (confirmations seen 2026-11-16): The Tonight Show Starring Jimmy Fallon Internships, and Advertising & Program Standards Internships. Running total at NBCU: 6 applications. Do not re-apply to these.", url:"https://www.nbcunicareers.com", status:"applied", appliedDate:"2026-11-16", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_NBCUniversal.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", altDocs:[{label:"Finance", resume:"files/Ima_Kennerly_Resume_NBCUniversal.docx", cover:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Finance.docx"}, {label:"Program Mgmt & Ops", resume:"files/Ima_Kennerly_Resume_NBCUniversal.docx", cover:"files/Ima_Kennerly_CoverLetter_NBCUniversal_ProgramManagementOps.docx"}, {label:"UTV Marketing & Brand Strategy", resume:"files/Ima_Kennerly_Resume_NBCUniversal.docx", cover:"files/Ima_Kennerly_CoverLetter_NBCUniversal_UTV_MarketingBrandStrategy.docx"}], postings:[{title:"The Tonight Show Starring Jimmy Fallon Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161897114", found:"2026-11-17"}, {title:"Film Production & Development Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161878602", found:"2026-11-17"}, {title:"Universal Pictures Publicty & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161879532", found:"2026-11-17"}, {title:"Focus Features Publicity & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161879639", found:"2026-11-17"}, {title:"Digital Transformation AR/VR Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161879279", found:"2026-11-17"}, {title:"Universal Film Production IT Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161876175", found:"2026-11-17"}, {title:"Universal Film Global Distribution Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161878709", found:"2026-11-17"}, {title:"Universal Film Global Distribution Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161877774", found:"2026-11-17"}, {title:"Human Resources & Culture Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161521750", found:"2026-11-14"}, {title:"Software Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161179529", found:"2026-11-12"}, {title:"Franchise, Products & Partnerships: Creative and Product Design & Development Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161161787", found:"2026-11-12"}, {title:"NBC News Creative & Digital Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161096049", found:"2026-11-12"}, {title:"NBC News Production & Digital Editorial Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160966800", found:"2026-11-11"}, {title:"NBC and Telemundo Local South Florida News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160960769", found:"2026-11-11"}, {title:"NBCU Chicago Digital Editorial Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160930370", found:"2026-11-11"}, {title:"Telemundo Chicago News Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160930672", found:"2026-11-11"}, {title:" NBCU Chicago Sales Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160928415", found:"2026-11-11"}, {title:"Creative Marketing Intern, NBCU Local Chicago – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160921300", found:"2026-11-11"}, {title:"NBC Chicago News Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160923895", found:"2026-11-11"}, {title:"NBC Chicago Community Relations and Special Events Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160922227", found:"2026-11-11"}, {title:"NBC 4 New York Marketing & Digital Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160733409", found:"2026-11-10"}, {title:"NBC News Communications, Marketing, and Research Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160733129", found:"2026-11-10"}, {title:"NBC News Group Technology Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160731770", found:"2026-11-10"}, {title:"NBC Local Production, Editorial, and Marketing News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160696244", found:"2026-11-10"}, {title:"NBC Local Production, Editorial, and Marketing News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160697599", found:"2026-11-10"}, {title:"NBC Local Production, Editorial, and Marketing News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160697300", found:"2026-11-10"}, {title:"NBC Local Los Angeles News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160695451", found:"2026-11-10"}, {title:"NBC Local Boston News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160694609", found:"2026-11-10"}, {title:"Telemundo 44 DC News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160693610", found:"2026-11-10"}, {title:"NBC 4 DC News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160691960", found:"2026-11-10"}, {title:"Advertising & Partnerships: Data Science Internship – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160689930", found:"2026-11-10"}, {title:"Advertising & Partnerships: Ad Products Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160686479", found:"2026-11-10"}, {title:"Ad Sales Sales & Sales Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160685279", found:"2026-11-10"}, {title:"Ad Sales Sales & Sales Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160685002", found:"2026-11-10"}, {title:"Ad Sales Sales & Sales Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160683650", found:"2026-11-10"}, {title:"Ad Sales Enterprise Marketing & Communications Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160682711", found:"2026-11-10"}, {title:"Ad Sales Enterprise Marketing & Communications Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160684410", found:"2026-11-10"}, {title:"Human Resources & Culture Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160681580", found:"2026-11-10"}, {title:"Human Resources & Culture Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160681769", found:"2026-11-10"}, {title:"Advertising & Partnerships: Enterprise Marketing & Communications Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160681069", found:"2026-11-10"}, {title:"Legal Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160680290", found:"2026-11-10"}, {title:"Legal Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160680779", found:"2026-11-10"}, {title:"Legal Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160678070", found:"2026-11-10"}, {title:"Advertising & Partnerships: Sales & Sales Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160680389", found:"2026-11-10"}, {title:"Legal Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160677312", found:"2026-11-10"}, {title:"Finance Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160678499", found:"2026-11-10"}, {title:"Finance Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160677969", found:"2026-11-10"}, {title:"Finance Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160677459", found:"2026-11-10"}, {title:"NBC News Bureau Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160671074", found:"2026-11-10"}, {title:"NBC News Bureau Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160672109", found:"2026-11-10"}, {title:"NBC News Bureau Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160668730", found:"2026-11-10"}, {title:"Music Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160664696", found:"2026-11-10"}, {title:"Platform Distribution & Partnerships: Business Development, Sales & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160661852", found:"2026-11-10"}, {title:"Music Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160663160", found:"2026-11-10"}, {title:"Platform Distribution & Partnerships: Business Development, Sales & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160664279", found:"2026-11-10"}, {title:"Government Affairs Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160661871", found:"2026-11-10"}, {title:"Government Affairs Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160660741", found:"2026-11-10"}, {title:"Sustainability Strategy Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160659354", found:"2026-11-10"}, {title:"Government Affairs Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160660975", found:"2026-11-10"}, {title:"Streaming Platforms, Product Management Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160661249", found:"2026-11-10"}, {title:"Program Management & Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160660769", found:"2026-11-10"}, {title:"Program Management & Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160660549", found:"2026-11-10"}, {title:"Program Management & Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160658984", found:"2026-11-10"}, {title:"Software Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160659459", found:"2026-11-10"}, {title:"Product Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160655850", found:"2026-11-10"}, {title:"Media Asset & Archival Management Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160656123", found:"2026-11-10"}, {title:"Media Tech: Cybersecurity, Governance & Security Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160654878", found:"2026-11-10"}, {title:"Media Tech: Data, AI & Machine Learning Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160649935", found:"2026-11-10"}, {title:"Media Tech: Data, AI & Machine Learning Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160650767", found:"2026-11-10"}, {title:"Media Tech: Product & Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160653439", found:"2026-11-10"}, {title:"Franchise, Products & Partnerships: Communications, Marketing, Strategy Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160649385", found:"2026-11-10"}, {title:"Media Tech: Product & Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160652254", found:"2026-11-10"}, {title:"Media Tech: Product & Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160652809", found:"2026-11-10"}, {title:"NBC Sports Logistics & Inventory Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160651569", found:"2026-11-10"}, {title:"Universal Pictures Publicity & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160649714", found:"2026-11-10"}, {title:"Global Security & Intelligence Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160648454", found:"2026-11-09"}, {title:"Global Security & Intelligence Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160649909", found:"2026-11-09"}, {title:"NBC Sports Production Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160648679", found:"2026-11-09"}, {title:"Studio Operations, Data Analytics Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160648109", found:"2026-11-09"}, {title:"Advertising & Program Standards Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160646119", found:"2026-11-09"}, {title:"NBC Sports Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160642921", found:"2026-11-09"}, {title:"Advertising & Program Standards Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160645520", found:"2026-11-09"}, {title:"NBC Sports Programming Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160642592", found:"2026-11-09"}, {title:"Telemundo Production & Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160645359", found:"2026-11-09"}, {title:"Telemundo News, Digital, & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160645208", found:"2026-11-09"}, {title:"NBCUniversal International Strategy & Ad Sales Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160645039", found:"2026-11-09"}, {title:"NBC Sports Olympic Digital & Production Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160643394", found:"2026-11-09"}, {title:"Universal Television Entertainment Digital, Creative & Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160636835", found:"2026-11-09"}, {title:"Universal Television Entertainment Digital, Creative & Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160635200", found:"2026-11-09"}, {title:"Universal Television Entertainment Finance Transformation Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160639829", found:"2026-11-09"}, {title:"Universal Television Entertainment Marketing, Communications & Brand Strategy Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160636964", found:"2026-11-09"}, {title:"Universal Television Entertainment Marketing, Communications & Brand Strategy Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160639419", found:"2026-11-09"}, {title:"Universal Television Entertainment Production, Development & Programming Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160639069", found:"2026-11-09"}, {title:"Universal Television Entertainment Production, Development & Programming Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160639019", found:"2026-11-09"}, {title:"NBC Sports Bay Area & California - Sales & Digital Media Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159988539", found:"2026-11-06"}, {title:"NBC Sports Bay Area & California - Marketing Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159950181", found:"2026-11-06"}, {title:"NBC Sports Bay Area & California - Finance Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159950049", found:"2026-11-06"}, {title:"NBC Sports Bay Area & California - Programming Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159947792", found:"2026-11-06"}, {title:"NBC Sports Bay Area & California - Production Assistant Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159947900", found:"2026-11-06"}, {title:"NBC News Production & Digital Editorial Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000162090202", found:"2026-11-17"}, {title:"NBC 4 New York Production & Editorial Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000162090679", found:"2026-11-17"}, {title:"NBC News Bureau Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000162090629", found:"2026-11-17"}]},
+  {id:"netflix", company:"Netflix", position:"Summer Internship", expected:"2026-08-25", note:"Rolling, posts from late Aug", url:"https://explore.jobs.netflix.net/careers?query=intern", status:"open", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Netflix_ContentStrategy.docx", postings:[{title:"Software Engineer Intern - Summer 2027", url:"https://explore.jobs.netflix.net/careers/job/790318904468", found:"2026-10-20", loc:{"label":"Los Gatos, CA","nyc":false,"remote":false}}, {title:"Strategy MBA Internship, Summer 2027", url:"https://explore.jobs.netflix.net/careers/job/790319427586", found:"2026-11-13", loc:{"label":"Los Angeles, CA","nyc":false,"remote":false}}]},
+  {id:"nbcu", company:"NBCUniversal", position:"Summer Internship Program", expected:"2026-09-15", note:"APPLIED 2026-11-16 to all 4 roles via SmartRecruiters guest Easy Apply: Film Production & Development, Program Management & Operations, Universal TV Marketing/Comms/Brand Strategy, and Finance. Each got the universal resume, its own cover letter, and the Syracuse advising transcript. Confirmation emails go to [redacted]. ALSO already applied independently (confirmations seen 2026-11-16): The Tonight Show Starring Jimmy Fallon Internships, and Advertising & Program Standards Internships. Running total at NBCU: 6 applications. Do not re-apply to these.", url:"https://www.nbcunicareers.com", status:"applied", appliedDate:"2026-11-16", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_NBCUniversal.docx", coverFile:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Production.docx", altDocs:[{label:"Finance", resume:"files/Ima_Kennerly_Resume_NBCUniversal.docx", cover:"files/Ima_Kennerly_CoverLetter_NBCUniversal_Finance.docx"}, {label:"Program Mgmt & Ops", resume:"files/Ima_Kennerly_Resume_NBCUniversal.docx", cover:"files/Ima_Kennerly_CoverLetter_NBCUniversal_ProgramManagementOps.docx"}, {label:"UTV Marketing & Brand Strategy", resume:"files/Ima_Kennerly_Resume_NBCUniversal.docx", cover:"files/Ima_Kennerly_CoverLetter_NBCUniversal_UTV_MarketingBrandStrategy.docx"}], postings:[{title:"The Tonight Show Starring Jimmy Fallon Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161897114", found:"2026-11-17", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Film Production & Development Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161878602", found:"2026-11-17", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Universal Pictures Publicty & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161879532", found:"2026-11-17", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Focus Features Publicity & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161879639", found:"2026-11-17", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Digital Transformation AR/VR Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161879279", found:"2026-11-17", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Universal Film Production IT Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161876175", found:"2026-11-17", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Universal Film Global Distribution Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161878709", found:"2026-11-17", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Universal Film Global Distribution Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161877774", found:"2026-11-17", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Human Resources & Culture Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161521750", found:"2026-11-14", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Software Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161179529", found:"2026-11-12", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Franchise, Products & Partnerships: Creative and Product Design & Development Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161161787", found:"2026-11-12", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"NBC News Creative & Digital Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000161096049", found:"2026-11-12", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC News Production & Digital Editorial Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160966800", found:"2026-11-11", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"NBC and Telemundo Local South Florida News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160960769", found:"2026-11-11", loc:{"label":"Miramar, FL","nyc":false,"remote":false}}, {title:"NBCU Chicago Digital Editorial Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160930370", found:"2026-11-11", loc:{"label":"Chicago, IL","nyc":false,"remote":false}}, {title:"Telemundo Chicago News Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160930672", found:"2026-11-11", loc:{"label":"Chicago, IL","nyc":false,"remote":false}}, {title:" NBCU Chicago Sales Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160928415", found:"2026-11-11", loc:{"label":"Chicago, IL","nyc":false,"remote":false}}, {title:"Creative Marketing Intern, NBCU Local Chicago – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160921300", found:"2026-11-11", loc:{"label":"Chicago, IL","nyc":false,"remote":false}}, {title:"NBC Chicago News Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160923895", found:"2026-11-11", loc:{"label":"Chicago, IL","nyc":false,"remote":false}}, {title:"NBC Chicago Community Relations and Special Events Intern – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160922227", found:"2026-11-11", loc:{"label":"Chicago, IL","nyc":false,"remote":false}}, {title:"NBC 4 New York Marketing & Digital Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160733409", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC News Communications, Marketing, and Research Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160733129", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC News Group Technology Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160731770", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC Local Production, Editorial, and Marketing News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160696244", found:"2026-11-10", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"NBC Local Production, Editorial, and Marketing News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160697599", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"NBC Local Production, Editorial, and Marketing News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160697300", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC Local Los Angeles News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160695451", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"NBC Local Boston News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160694609", found:"2026-11-10", loc:{"label":"Needham, MA","nyc":false,"remote":false}}, {title:"Telemundo 44 DC News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160693610", found:"2026-11-10", loc:{"label":"Washington, DC","nyc":false,"remote":false}}, {title:"NBC 4 DC News Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160691960", found:"2026-11-10", loc:{"label":"Washington, DC","nyc":false,"remote":false}}, {title:"Advertising & Partnerships: Data Science Internship – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160689930", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Advertising & Partnerships: Ad Products Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160686479", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Ad Sales Sales & Sales Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160685279", found:"2026-11-10", loc:{"label":"Birmingham, MI","nyc":false,"remote":false}}, {title:"Ad Sales Sales & Sales Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160685002", found:"2026-11-10", loc:{"label":"Atlanta, GA","nyc":false,"remote":false}}, {title:"Ad Sales Sales & Sales Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160683650", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Ad Sales Enterprise Marketing & Communications Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160682711", found:"2026-11-10", loc:{"label":"Stamford, CT","nyc":false,"remote":false}}, {title:"Ad Sales Enterprise Marketing & Communications Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160684410", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Human Resources & Culture Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160681580", found:"2026-11-10", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"Human Resources & Culture Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160681769", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Advertising & Partnerships: Enterprise Marketing & Communications Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160681069", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Legal Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160680290", found:"2026-11-10", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"Legal Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160680779", found:"2026-11-10", loc:{"label":"Washington, DC","nyc":false,"remote":false}}, {title:"Legal Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160678070", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Advertising & Partnerships: Sales & Sales Support Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160680389", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Legal Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160677312", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Finance Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160678499", found:"2026-11-10", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"Finance Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160677969", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Finance Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160677459", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"NBC News Bureau Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160671074", found:"2026-11-10", loc:{"label":"Chicago, IL","nyc":false,"remote":false}}, {title:"NBC News Bureau Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160672109", found:"2026-11-10", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"NBC News Bureau Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160668730", found:"2026-11-10", loc:{"label":"Washington, DC","nyc":false,"remote":false}}, {title:"Music Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160664696", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Platform Distribution & Partnerships: Business Development, Sales & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160661852", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Music Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160663160", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Platform Distribution & Partnerships: Business Development, Sales & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160664279", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Government Affairs Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160661871", found:"2026-11-10", loc:{"label":"Washington, DC","nyc":false,"remote":false}}, {title:"Government Affairs Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160660741", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Sustainability Strategy Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160659354", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Government Affairs Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160660975", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Streaming Platforms, Product Management Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160661249", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Program Management & Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160660769", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Program Management & Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160660549", found:"2026-11-10", loc:{"label":"Stamford, CT","nyc":false,"remote":false}}, {title:"Program Management & Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160658984", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Software Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160659459", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Product Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160655850", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Media Asset & Archival Management Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160656123", found:"2026-11-10", loc:{"label":"North Bergen, NJ","nyc":false,"remote":false}}, {title:"Media Tech: Cybersecurity, Governance & Security Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160654878", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Media Tech: Data, AI & Machine Learning Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160649935", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Media Tech: Data, AI & Machine Learning Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160650767", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Media Tech: Product & Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160653439", found:"2026-11-10", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"Franchise, Products & Partnerships: Communications, Marketing, Strategy Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160649385", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Media Tech: Product & Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160652254", found:"2026-11-10", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Media Tech: Product & Engineering Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160652809", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC Sports Logistics & Inventory Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160651569", found:"2026-11-10", loc:{"label":"Stamford, CT","nyc":false,"remote":false}}, {title:"Universal Pictures Publicity & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160649714", found:"2026-11-10", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Global Security & Intelligence Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160648454", found:"2026-11-09", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Global Security & Intelligence Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160649909", found:"2026-11-09", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC Sports Production Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160648679", found:"2026-11-09", loc:{"label":"Stamford, CT","nyc":false,"remote":false}}, {title:"Studio Operations, Data Analytics Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160648109", found:"2026-11-09", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Advertising & Program Standards Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160646119", found:"2026-11-09", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC Sports Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160642921", found:"2026-11-09", loc:{"label":"Stamford, CT","nyc":false,"remote":false}}, {title:"Advertising & Program Standards Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160645520", found:"2026-11-09", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"NBC Sports Programming Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160642592", found:"2026-11-09", loc:{"label":"Stamford, CT","nyc":false,"remote":false}}, {title:"Telemundo Production & Operations Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160645359", found:"2026-11-09", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"Telemundo News, Digital, & Marketing Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160645208", found:"2026-11-09", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"NBCUniversal International Strategy & Ad Sales Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160645039", found:"2026-11-09", loc:{"label":"Miami, FL","nyc":false,"remote":false}}, {title:"NBC Sports Olympic Digital & Production Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160643394", found:"2026-11-09", loc:{"label":"Stamford, CT","nyc":false,"remote":false}}, {title:"Universal Television Entertainment Digital, Creative & Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160636835", found:"2026-11-09", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Universal Television Entertainment Digital, Creative & Design Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160635200", found:"2026-11-09", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Universal Television Entertainment Finance Transformation Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160639829", found:"2026-11-09", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Universal Television Entertainment Marketing, Communications & Brand Strategy Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160636964", found:"2026-11-09", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"Universal Television Entertainment Marketing, Communications & Brand Strategy Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160639419", found:"2026-11-09", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Universal Television Entertainment Production, Development & Programming Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160639069", found:"2026-11-09", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Universal Television Entertainment Production, Development & Programming Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000160639019", found:"2026-11-09", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}, {title:"NBC Sports Bay Area & California - Sales & Digital Media Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159988539", found:"2026-11-06", loc:{"label":"San Francisco, CA","nyc":false,"remote":false}}, {title:"NBC Sports Bay Area & California - Marketing Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159950181", found:"2026-11-06", loc:{"label":"San Francisco, CA","nyc":false,"remote":false}}, {title:"NBC Sports Bay Area & California - Finance Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159950049", found:"2026-11-06", loc:{"label":"San Francisco, CA","nyc":false,"remote":false}}, {title:"NBC Sports Bay Area & California - Programming Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159947792", found:"2026-11-06", loc:{"label":"San Francisco, CA","nyc":false,"remote":false}}, {title:"NBC Sports Bay Area & California - Production Assistant Intern - Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000159947900", found:"2026-11-06", loc:{"label":"San Francisco, CA","nyc":false,"remote":false}}, {title:"NBC News Production & Digital Editorial Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000162090202", found:"2026-11-17", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC 4 New York Production & Editorial Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000162090679", found:"2026-11-17", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"NBC News Bureau Internships – Summer 2027", url:"https://jobs.smartrecruiters.com/NBCUniversal3/744000162090629", found:"2026-11-17", loc:{"label":"Universal City, CA","nyc":false,"remote":false}}]},
   {id:"wbd_media", company:"Warner Bros. Discovery", position:"Development/Production Internship", expected:"2027-01-15", note:"Media/dev track opens later than tech track", url:"https://careers.wbd.com/global/en/internship-opportunities", status:"notopen", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WBD_Development.docx", postings:[]},
   {id:"paramount", company:"Paramount", position:"TV/Film Development Internship", expected:"2026-10-15", note:"Deadline typically late Dec/early Jan", url:"https://www.paramount.com/careers", status:"notopen", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Paramount_TVFilmDevelopment.docx", postings:[]},
   {id:"a24", company:"A24", position:"Development Internship", expected:"2027-02-15", note:"500–1,500 applicants per seat", url:"https://a24films.com", status:"notopen", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_A24_Development.docx", postings:[]},
-  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Network Engineering Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/bristol/network-engineering-intern-summer-2027/391/103123353840", found:"2026-11-11"}, {title:"Data Engineering Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/new-york/data-engineering-intern-summer-2027/391/103401406288", found:"2026-11-17"}, {title:"Product Management Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/glendale/product-management-intern-summer-2027/391/103127364272", found:"2026-11-11"}]},
+  {id:"disney", company:"Disney", position:"Entertainment + Corp. Strategy focus — all departments scanned", expected:"2026-09-15", note:"Merged Entertainment & CSBDT rows. Summer 2027 reqs have started appearing — postings here sometimes come down inside a week.", url:"https://www.disneycareers.com/en/search-jobs/Summer%202027/", status:"open", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Disney_Entertainment.docx", altDocs:[{label:"Strategy / CSBDT", resume:"files/Ima_Kennerly_Resume_Strategy.docx", cover:"files/Ima_Kennerly_CoverLetter_Disney_CSBDT_Strategy.docx"}], postings:[{title:"Network Engineering Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/bristol/network-engineering-intern-summer-2027/391/103123353840", found:"2026-11-11", loc:{"label":"Bristol, CT","nyc":false,"remote":false}}, {title:"Data Engineering Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/new-york/data-engineering-intern-summer-2027/391/103401406288", found:"2026-11-17", loc:{"label":"New York, NY","nyc":true,"remote":false}}, {title:"Product Management Intern, Summer 2027", url:"https://www.disneycareers.com/en/job/glendale/product-management-intern-summer-2027/391/103127364272", found:"2026-11-11", loc:{"label":"Glendale, CA","nyc":false,"remote":false}}]},
   {id:"sony", company:"Sony Pictures", position:"Emerging Talent — Content Strategy & Acquisition", expected:"2026-10-01", note:"Fall, following NBCU/Netflix", url:"https://www.sonypicturesjobs.com/internships", status:"notopen", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_Strategy.docx", coverFile:"files/Ima_Kennerly_CoverLetter_SonyPictures_ContentStrategy.docx", postings:[]},
   {id:"uta", company:"UTA", position:"Summer Internship Program", expected:"2026-10-01", note:"Built for college juniors", url:"https://www.unitedtalent.com/careers", status:"notopen", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_UTA_SummerInternship.docx", postings:[]},
-  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"open", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[{title:"CAA ICON Strategic Advisory Intern – Summer 2027 (Denver, CO)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Denver-CO/CAA-ICON-Strategic-Advisory-Intern---Summer-2027--Denver--CO-_JR9390-1", found:"2026-10-20"}, {title:"CAA ICON Sports Data Analytics Intern – Summer 2027 (Denver, CO)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Denver-CO/CAA-ICON-Data-Analytics-Intern---Summer-2027--Denver--CO-_JR9391", found:"2026-10-20"}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (Charlotte, NC)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Charlotte-NC/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--Charlotte--NC-_JR9394-1", found:"2026-10-20"}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (Washington DC)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Washington-DC/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--Washington-DC-_JR9392-1", found:"2026-10-20"}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (Oklahoma City, OK)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Oklahoma-City-OK/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--Oklahoma-City--OK-_JR9393-1", found:"2026-10-20"}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (San Jose, CA)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/San-Jose-CA/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--San-Jose--CA-_JR9396-1", found:"2026-10-20"}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (Salt Lake City, UT)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Salt-Lake-City-UT/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--Salt-Lake-City--UT-_JR9395-1", found:"2026-10-20"}]},
+  {id:"caa", company:"CAA", position:"Summer Internship Program", expected:"2026-10-01", note:"Also targets juniors", url:"https://www.caa.com/careers/internships", status:"open", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_CAA_SummerInternship.docx", postings:[{title:"CAA ICON Strategic Advisory Intern – Summer 2027 (Denver, CO)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Denver-CO/CAA-ICON-Strategic-Advisory-Intern---Summer-2027--Denver--CO-_JR9390-1", found:"2026-10-20", loc:{"label":"Denver, CO","nyc":false,"remote":false}}, {title:"CAA ICON Sports Data Analytics Intern – Summer 2027 (Denver, CO)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Denver-CO/CAA-ICON-Data-Analytics-Intern---Summer-2027--Denver--CO-_JR9391", found:"2026-10-20", loc:{"label":"Denver, CO","nyc":false,"remote":false}}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (Charlotte, NC)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Charlotte-NC/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--Charlotte--NC-_JR9394-1", found:"2026-10-20", loc:{"label":"Charlotte, NC","nyc":false,"remote":false}}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (Washington DC)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Washington-DC/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--Washington-DC-_JR9392-1", found:"2026-10-20", loc:{"label":"Washington, DC","nyc":false,"remote":false}}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (Oklahoma City, OK)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Oklahoma-City-OK/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--Oklahoma-City--OK-_JR9393-1", found:"2026-10-20", loc:{"label":"Oklahoma City, OK","nyc":false,"remote":false}}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (San Jose, CA)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/San-Jose-CA/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--San-Jose--CA-_JR9396-1", found:"2026-10-20", loc:{"label":"San Jose, CA","nyc":false,"remote":false}}, {title:"CAA ICON Owner’s Representative / Construction Project Management Intern – Summer 2027 (Salt Lake City, UT)", url:"https://caa.wd1.myworkdayjobs.com/Careers/job/Salt-Lake-City-UT/CAA-ICON-Owner-s-Representative---Construction-Project-Management-Intern---Summer-2027--Salt-Lake-City--UT-_JR9395-1", found:"2026-10-20", loc:{"label":"Salt Lake City, UT","nyc":false,"remote":false}}]},
   {id:"wme", company:"WME (Endeavor)", position:"Summer Internship Program", expected:"2026-10-01", note:"Rotational, ends in pitch", url:"https://wmeimg.wd1.myworkdayjobs.com/WMEGRP", status:"notopen", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_Agency.docx", coverFile:"files/Ima_Kennerly_CoverLetter_WME_SummerInternship.docx", postings:[]},
   {id:"blumhouse", company:"Blumhouse", position:"Development/Production Internship", expected:"2027-02-01", note:"Paid, in-person LA only", url:"https://www.blumhouse.com", status:"notopen", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_Blumhouse_DevelopmentProduction.docx", postings:[]},
   {id:"anon", company:"Anonymous Content", position:"Development Internship", expected:null, note:"Rolling/seasonal — check monthly", url:"https://www.anonymouscontent.com/careers/", status:"notopen", lastChecked:"2026-11-17", resumeFile:"files/Ima_Kennerly_Resume_ProductionDevelopment.docx", coverFile:"files/Ima_Kennerly_CoverLetter_AnonymousContent_Development.docx", postings:[]},
@@ -1692,16 +1883,16 @@ const TERM = {
 const FINAL_EXAMS = [
   {courseId:"acc201", final:true, date:"2026-12-15", start:"10:15", end:"12:15",
    note:"TTh 3:30–4:50 maps to Period 16. Listed as Exam 4 on the course schedule updated 10/14/26."},
-  {courseId:"hnr350", final:true, date:"2026-12-14", start:"12:45", end:"14:45",
-   note:"MW 12:45–2:05 maps to Period 11. Stated in the syllabus under Important Dates."},
+  {courseId:"hnr350", final:false,
+   note:"No final. Ima confirmed this directly (2026-11-17). The syllabus lists a university-scheduled slot of Mon Dec 14, 12:45–2:45 PM and \"Final Research Project Presentations: TBD\", but the course is not using it — the final research project is submitted work, not a seated exam."},
   {courseId:"eee370", final:false,
    note:"No seated final. The course ends with the Business Model Pitch in class Tue Dec 8 and the Original Concept & Business Model report due Fri Dec 11."},
   {courseId:"phi311", final:false,
    note:"No seated final. Grade is reading questions 20%, worksheets 40%, and four in-class argument analyses 40% — the last of them Dec 3."},
   {courseId:"trf444", final:false,
    note:"No seated final. Finals are due Wed Dec 9 as a submission; the last in-class day was Dec 2."},
-  {courseId:"trf340", final:null,
-   note:"Unknown — the course is still listed Closed on Blackboard, so no syllabus is available."},
+  {courseId:"trf340", final:true, date:"2026-12-15", start:"15:00", end:"17:00",
+   note:"Confirmed by Ima (2026-11-17). Matches the Registrar's Period 18 for a Mon 2:15 PM class: Tuesday Dec 15, 3:00–5:00 PM. The course is still listed Closed on Blackboard, so there is no syllabus to cross-check."},
 ];
 
 /* Courses whose instructor ends before the university's last day of
@@ -2680,6 +2871,25 @@ let currentFilter = "all";
    only — deliberately not persisted, so every visit starts compact). */
 let postingExpanded = {};
 
+/* Location filter. Ima is looking for New York work, so the pipeline shows
+   only roles based in NYC or offering a remote option by default. Each
+   posting carries loc:{label,nyc,remote} resolved from the employer's own
+   job API (SmartRecruiters / Disney / Netflix), not guessed from the title —
+   most titles name no city at all. A posting with no loc is treated as
+   unknown and kept, so a scan that fails to resolve a location can never
+   silently hide a real New York job. */
+let nycOnly = true;
+try{ const v = localStorage.getItem("internship-tracker:nycOnly"); if(v !== null) nycOnly = (v === "1"); }catch(_){}
+
+function postingMatchesLocation(p){
+  if(!nycOnly) return true;
+  if(!p.loc) return true;              // unresolved: show rather than hide
+  return !!(p.loc.nyc || p.loc.remote);
+}
+function visiblePostings(postings){
+  return (postings || []).filter(postingMatchesLocation);
+}
+
 /* Fold postings that share a title into one row. Employers list the same
    role once per city with a distinct id, so the titles collide exactly;
    the earliest "found" date is kept so the row still reads as the date
@@ -2689,12 +2899,23 @@ function groupPostings(postings){
   (postings || []).forEach(p => {
     const key = (p.title || "").trim().replace(/\s+/g, " ");
     if(!key) return;
-    if(!byTitle.has(key)) byTitle.set(key, {title:key, urls:[], found:p.found});
+    if(!byTitle.has(key)) byTitle.set(key, {title:key, urls:[], found:p.found, places:[], anyNyc:false});
     const g = byTitle.get(key);
     if(g.urls.indexOf(p.url) < 0) g.urls.push(p.url);
     if(p.found && (!g.found || p.found < g.found)) g.found = p.found;
+    if(p.loc){
+      if(p.loc.nyc || p.loc.remote) g.anyNyc = true;
+      const label = p.loc.remote ? "Remote" : (p.loc.label || "");
+      if(label && g.places.indexOf(label) < 0) g.places.push(label);
+    }
   });
-  return [...byTitle.values()].sort((a,b) => (b.found || "").localeCompare(a.found || ""));
+  const out = [...byTitle.values()];
+  out.forEach(g => {
+    g.where = g.places.length > 2
+      ? (g.places.slice(0,2).join(" · ") + " +" + (g.places.length-2))
+      : g.places.join(" · ");
+  });
+  return out.sort((a,b) => (b.found || "").localeCompare(a.found || ""));
 }
 
 let cardStates = {};
@@ -2731,7 +2952,7 @@ async function render(){
     if(state.status === "open" ){
       // Grouped, then capped: CAA alone lists the same role in seven cities,
       // and spelling every one of them out turned this banner into a wall.
-      const ps = groupPostings(c.postings);
+      const ps = groupPostings(visiblePostings(c.postings));
       if(ps.length){
         const LEAD = 3;
         const head = ps.slice(0, LEAD)
@@ -2783,23 +3004,30 @@ async function render(){
     // card grew taller than every other card combined and wrecked the grid.
     // Identical titles are therefore folded into a single row carrying all of
     // that role's location links, and the fold is capped until expanded.
-    const grouped = groupPostings(postings);
+    const visible = visiblePostings(postings);
+    const hiddenByLocation = postings.length - visible.length;
+    const grouped = groupPostings(visible);
     const expanded = !!postingExpanded[c.id];
     const CAP = 6;
     const shown = expanded ? grouped : grouped.slice(0, CAP);
     const hidden = grouped.length - shown.length;
-    const postingsHtml = postings.length ? `
+    const locNote = hiddenByLocation > 0
+      ? ` · <span class="postings-hidden">${hiddenByLocation} elsewhere</span>` : ``;
+    const postingsHtml = !postings.length ? `` : !grouped.length ? `
+      <div class="postings postings-empty">
+        <div class="postings-label">No New York roles open · ${postings.length} listed elsewhere</div>
+      </div>` : `
       <div class="postings">
-        <div class="postings-label">${grouped.length} Summer 2027 role${grouped.length===1?"":"s"} open${postings.length !== grouped.length ? ` · ${postings.length} listings` : ``}</div>
+        <div class="postings-label">${grouped.length} role${grouped.length===1?"":"s"} open${visible.length !== grouped.length ? ` · ${visible.length} listings` : ``}${locNote}</div>
         ${shown.map(g => `
           <div class="posting-item">
             <a href="${g.urls[0]}" target="_blank" rel="noopener" class="posting-link">${g.title} →</a>
             ${g.urls.length > 1 ? `<div class="posting-alts">${g.urls.map((u,i) => `<a href="${u}" target="_blank" rel="noopener">#${i+1}</a>`).join("")}<span class="posting-alts-note">${g.urls.length} locations</span></div>` : ``}
-            ${g.found ? `<div class="posting-meta">found ${fmtDate(g.found)}</div>` : ``}
+            <div class="posting-meta">${g.where ? `<span class="posting-where${g.anyNyc?" is-nyc":""}">${g.where}</span>` : ``}${g.found ? `${g.where?" · ":""}found ${fmtDate(g.found)}` : ``}</div>
           </div>`).join("")}
         ${hidden > 0 ? `<button type="button" class="posting-more" data-company="${c.id}">Show ${hidden} more role${hidden===1?"":"s"}</button>` : ``}
         ${expanded && grouped.length > CAP ? `<button type="button" class="posting-more" data-company="${c.id}">Show fewer</button>` : ``}
-      </div>` : ``;
+      </div>`;
 
     card.innerHTML = `
       <div class="card-top">
@@ -4276,6 +4504,25 @@ function setView(view, remember){
   }
   window.scrollTo({top:0, behavior:"instant"});
 }
+/* NYC / remote filter toggle. Off state is remembered per browser so the
+   choice survives a reload. */
+function renderNycToggle(){
+  const b = document.getElementById("nycToggleBtn");
+  if(!b) return;
+  b.classList.toggle("active", nycOnly);
+  b.textContent = (nycOnly ? "\u25c9" : "\u25cb") + " NYC / remote only";
+  b.setAttribute("aria-pressed", nycOnly ? "true" : "false");
+}
+document.getElementById("nycToggleBtn").addEventListener("click", ()=>{
+  nycOnly = !nycOnly;
+  try{ localStorage.setItem("internship-tracker:nycOnly", nycOnly ? "1" : "0"); }catch(_){}
+  postingExpanded = {};
+  renderNycToggle();
+  render();
+  renderTodayPanel();
+});
+renderNycToggle();
+
 document.getElementById("viewTabs").addEventListener("click", (e)=>{
   const b = e.target.closest(".view-tab");
   if(b) setView(b.dataset.view);
@@ -4324,7 +4571,7 @@ function renderTodayPanel(){
     const status = st ? st.status : c.status;
     if(status === "open") open++;
     if(status === "applied" || status === "interviewing") applied++;
-    roles += groupPostings(c.postings).length;
+    roles += groupPostings(visiblePostings(c.postings)).length;
   });
 
   const daysLeft = Math.max(0, daysUntil(TERM.lastDay));
