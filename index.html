@@ -1099,17 +1099,35 @@
   /* --- one measure for every full-bleed container ---------------------- */
   .slate-header > *, .action-bar, .grid, .add-row, .schedule-note,
   .schedule-wrap, .section-divider, .docs-panel, .controls, #careerTaskList,
-  .view-tabs, .today-panel, .growth-panel, .message-alert-panel, .footer-note{
+  .today-panel, .growth-panel, .message-alert-panel, .footer-note{
     max-width: var(--maxw);
     margin-left: auto;
     margin-right: auto;
   }
   .grid{ align-items:start; gap:18px; margin-top:26px; }
 
+  /* The internship pipeline uses column flow rather than a row grid. In a
+     grid every row is as tall as its tallest card, so one long card (NBC's
+     posting list) left a band of dead space under every short card beside
+     it. Columns pack each card against the one above it, so there are no
+     gaps regardless of how uneven the content is. */
+  #grid{
+    display:block;
+    column-gap:18px;
+    columns:4 320px;
+  }
+  #grid .card{
+    break-inside:avoid;
+    -webkit-column-break-inside:avoid;
+    page-break-inside:avoid;
+    margin:0 0 18px;
+    display:block;
+    width:100%;
+  }
+
   /* --- header ----------------------------------------------------------- */
   .slate-header{
-    padding:0 0 26px;
-    border-bottom:1px solid var(--hairline);
+    padding:0 0 24px;
     background:#0A0B0C;
   }
   .slate-top-stripe{
@@ -1141,6 +1159,7 @@
 
   /* --- action bar: an accented panel, not a red field ------------------- */
   .action-bar{ margin:30px auto 0; }
+  #view-pipeline .action-bar{ margin-top:34px; }
   .action-panel{
     background:var(--slate-card);
     color:var(--ink);
@@ -1214,13 +1233,24 @@
   .docs-links a:hover{ color:var(--yellow); }
 
   /* --- view tabs --------------------------------------------------------- */
+  /* Tabs sit directly under the header and stick there, so switching views
+     never means scrolling back up. max-width is dropped in favour of a
+     full-bleed bar: a sticky strip that stops short of the window edges
+     leaves content visibly sliding past it. */
   .view-tabs{
+    position:sticky;
+    top:0;
+    z-index:40;
     display:flex;
     flex-wrap:wrap;
     gap:4px;
+    max-width:none;
     padding-left:var(--gutter);
     padding-right:var(--gutter);
-    margin-top:40px;
+    margin-top:0;
+    background:rgba(10,11,12,0.94);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
     border-bottom:1px solid var(--hairline);
   }
   .view-tab{
@@ -1245,7 +1275,7 @@
 
   /* --- section headers --------------------------------------------------- */
   .section-divider{
-    margin-top:46px;
+    margin-top:38px;
     padding-top:0;
     border-top:0;
   }
@@ -1403,7 +1433,7 @@
   .posting-more:hover{ color:var(--yellow); border-color:var(--yellow-dim); }
 
   /* --- call sheet ---------------------------------------------------------- */
-  .today-panel{ margin-top:34px; padding:0 var(--gutter); }
+  .today-panel{ margin-top:30px; padding:0 var(--gutter); }
   .today-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:16px; padding-bottom:14px; }
   .today-kicker{
     font-family:'Oswald',sans-serif;
@@ -1544,6 +1574,17 @@
   </div>
 </div>
 
+<nav class="view-tabs" id="viewTabs" aria-label="Sections"><button class="view-tab active" data-view="pipeline" type="button">Pipeline</button><button class="view-tab" data-view="deadlines" type="button">School</button><button class="view-tab" data-view="study" type="button">Study</button><button class="view-tab" data-view="career" type="button">Tasks</button><button class="view-tab" data-view="contacts" type="button">Contacts</button><button class="view-tab" data-view="thesis" type="button">Thesis</button></nav>
+
+<!-- ======================================================================
+     TODAY panel + view tabs. The page used to be one 25,000px scroll with
+     every section stacked; finding anything meant hunting. Each section is
+     now its own view and only the active one is displayed, with a standing
+     summary of what actually needs attention today above them.
+     ====================================================================== -->
+<div class="today-panel" id="todayPanel"></div>
+
+<section class="view" id="view-pipeline" data-view="pipeline">
 <div class="action-bar">
   <div class="action-panel" id="actionPanel">
     <span class="label">Action needed</span>
@@ -1590,16 +1631,6 @@
   </div>
 </div>
 
-<!-- ======================================================================
-     TODAY panel + view tabs. The page used to be one 25,000px scroll with
-     every section stacked; finding anything meant hunting. Each section is
-     now its own view and only the active one is displayed, with a standing
-     summary of what actually needs attention today above them.
-     ====================================================================== -->
-<div class="today-panel" id="todayPanel"></div>
-
-<nav class="view-tabs" id="viewTabs" aria-label="Sections"><button class="view-tab active" data-view="pipeline" type="button">Pipeline</button><button class="view-tab" data-view="deadlines" type="button">School</button><button class="view-tab" data-view="study" type="button">Study</button><button class="view-tab" data-view="career" type="button">Tasks</button><button class="view-tab" data-view="contacts" type="button">Contacts</button><button class="view-tab" data-view="thesis" type="button">Thesis</button></nav>
-<section class="view" id="view-pipeline" data-view="pipeline">
 <div class="section-divider" id="internships">
   <div class="scene-tag">Scene 1</div>
   <h2>Internship Pipeline</h2>
