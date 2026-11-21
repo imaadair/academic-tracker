@@ -1814,7 +1814,7 @@
   <br><br>
   <b>Term calendar (Fall 2026):</b> classes run <b>Mon Aug 24 – Tue Dec 8</b>. Reading days are Dec 9, 12 and 13; final examinations run Dec 10–11 and Dec 14–15; the semester ends Dec 15. These come from Syracuse's official 2026–27 Academic Calendar and the Registrar's Fall 2026 Final Examination Schedule. The weekly viewer stops drawing classes after the last day of classes and after any course's own earlier final meeting — before this was added it drew your schedule forever, straight through winter break.
   <br><br>
-  <b>Final exams:</b> exam dates and times are fixed by the Registrar from each course's meeting pattern and are "not subject to change, either by student or faculty request." you sit two, both on <b>Tuesday Dec 15</b>: <b>ACC 201</b> at 10:15 AM–12:15 PM and <b>TRF 340</b> at 3:00–5:00 PM. <b>EEE 370</b>, <b>PHI 311</b>, <b>TRF 444</b> and <b>HNR 350</b> have no seated final — they finish on coursework. (HNR 350's syllabus does list a university slot on Dec 14, but the course isn't using it.)
+  <b>Final exams:</b> exam dates and times are fixed by the Registrar from each course's meeting pattern and are "not subject to change, either by student or faculty request." you sit three. <b>HNR 350</b> is first — <b>Monday Dec 14</b>, 12:45–2:45 PM, and it is the final research project presentation rather than a written exam. Then both of <b>ACC 201</b> at 10:15 AM–12:15 PM and <b>TRF 340</b> at 3:00–5:00 PM on <b>Tuesday Dec 15</b>. <b>EEE 370</b>, <b>PHI 311</b> and <b>TRF 444</b> have no seated final — they finish on coursework.
   <br><br>
   <b>Folder structure needed:</b> for the Resume/Cover letter links on each card to work, keep this file alongside a <code>files/</code> subfolder containing all your resumes, cover letters, and <code>Ima_Kennerly_References.docx</code>.
   <br><br>
@@ -2025,8 +2025,9 @@ const TERM = {
 const FINAL_EXAMS = [
   {courseId:"acc201", final:true, date:"2026-12-15", start:"10:15", end:"12:15",
    note:"TTh 3:30–4:50 maps to Period 16. Listed as Exam 4 on the course schedule updated 10/14/26."},
-  {courseId:"hnr350", final:false,
-   note:"No final. Ima confirmed this directly (2026-11-17). The syllabus lists a university-scheduled slot of Mon Dec 14, 12:45–2:45 PM and \"Final Research Project Presentations: TBD\", but the course is not using it — the final research project is submitted work, not a seated exam."},
+  {courseId:"hnr350", final:true, date:"2026-12-14", start:"12:45", end:"14:45",
+   label:"final research project presentations",
+   note:"Corrected by Ima (2026-11-21): there IS a final, and it is the research project presentation. The date and time are the university-scheduled slot the syllabus names — Mon Dec 14, 12:45–2:45 PM, which matches the Registrar's period for an MW 12:45 class — because the syllabus itself lists the presentations as TBD. Worth confirming the slot with the instructor."},
   {courseId:"eee370", final:false,
    note:"No seated final. The course ends with the Business Model Pitch in class Tue Dec 8 and the Original Concept & Business Model report due Fri Dec 11."},
   {courseId:"phi311", final:false,
@@ -4839,7 +4840,7 @@ function scheduleFor(dateIso){
     out.push({
       start: f.start, end: f.end,
       code: (course ? course.code : "") + " final",
-      color: "#F2B134", room: "Final exam", off: false, exam: true
+      color: "#F2B134", room: f.label || "Final exam", off: false, exam: true
     });
   });
   out.sort(function(a,b){ return minutesOf(a.start) - minutesOf(b.start); });
@@ -4924,7 +4925,7 @@ function renderTodayPanel(){
   });
   FINAL_EXAMS.filter(f => f.final === true && f.date >= today).forEach(f => {
     const course = COURSES.find(c => c.id === f.courseId);
-    upcoming.push({date:f.date, label:(course?course.code:"")+" final exam \u2014 "+fmt12(f.start)+"\u2013"+fmt12(f.end),
+    upcoming.push({date:f.date, label:(course?course.code:"")+" "+(f.label || "final exam")+" \u2014 "+fmt12(f.start)+"\u2013"+fmt12(f.end),
                    color:course?course.color:"#8a8a85", exam:true, far:true});
   });
   upcoming.sort((a,b) => a.date.localeCompare(b.date));
